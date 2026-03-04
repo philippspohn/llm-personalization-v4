@@ -1,0 +1,5 @@
+type: principle
+model: nvidia/Llama-3.3-Nemotron-70B-Reward-Principle
+torch_dtype: bfloat16
+device_map: auto
+batch_size: 4

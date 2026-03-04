@@ -1,0 +1,14 @@
+# Core ML
+torch
+transformers>=5.2.0
+accelerate  # needed for device_map="auto"
+
+# Inference
+vllm>=0.17.0
+
+# Config management
+hydra-core
+omegaconf
+
+# Utilities
+pyyaml
