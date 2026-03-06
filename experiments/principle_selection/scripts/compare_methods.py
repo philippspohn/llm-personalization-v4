@@ -105,7 +105,8 @@ def main(cfg: DictConfig) -> None:
         for g in data['groups']:
             alts = [m for m in g['members'] if m != g['representative']][:5]
             alts_str = ', '.join(alts) if alts else '—'
-            print(f"  {g['representative']:<40s}  [{alts_str}]")
+            print(f"  {g['representative']:<40s}")
+            # print(f"  {g['representative']:<40s}  [{alts_str}]")
         print()
 
 
