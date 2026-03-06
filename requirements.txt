@@ -21,3 +21,4 @@ matplotlib
 scipy
 factor_analyzer
 seaborn
+umap-learn

@@ -30,7 +30,8 @@ def varimax(loadings, max_iter=100, tol=1e-6):
 
 @hydra.main(version_base=None, config_path="../configs", config_name="config")
 def main(cfg: DictConfig) -> None:
-    scores_matrix = np.load(Path(get_original_cwd()) / cfg.output_path)
+    npy_path = Path(get_original_cwd()) / cfg.output_path
+    scores_matrix = np.load(npy_path)
     num_conversations, num_principles = scores_matrix.shape
     principle_names = candidate_principles
 
@@ -97,6 +98,36 @@ def main(cfg: DictConfig) -> None:
             print(f"  {name:<45s} {loading:+.3f}")
         print()
 
+    # Antonym correlations (robustness check)
+    antonym_pairs = [
+        ('formal', 'casual'),
+        ('concise', 'verbose'),
+        ('optimistic', 'pessimistic'),
+        ('emotionally neutral', 'appeals to emotion'),
+        ('acknowledges uncertainty', 'absolute certainty'),
+    ]
+    name_to_idx = {name: i for i, name in enumerate(principle_names)}
+    print("Antonym correlations (negative = judge discriminates well):")
+    for a, b in antonym_pairs:
+        if a in name_to_idx and b in name_to_idx:
+            c = corr_matrix[name_to_idx[a], name_to_idx[b]]
+            print(f"  {a} / {b}: {c:+.3f}")
+            col_a = scores_matrix[:, name_to_idx[a]]
+            col_b = scores_matrix[:, name_to_idx[b]]
+            print(f"    {a}: mean={col_a.mean():.1f} std={col_a.std():.1f} range=[{col_a.min():.0f},{col_a.max():.0f}]")
+            print(f"    {b}: mean={col_b.mean():.1f} std={col_b.std():.1f} range=[{col_b.min():.0f},{col_b.max():.0f}]")
+            pair_sum = col_a + col_b
+            print(f"    sum: mean={pair_sum.mean():.1f} std={pair_sum.std():.1f} range=[{pair_sum.min():.0f},{pair_sum.max():.0f}]")
+    print()
+
+    # Selections at different budgets
+    for budget in [4, 8, 16, 32]:
+        subset = selected[:budget]
+        print(f"Top {len(subset)} principles:")
+        for s in subset:
+            print(f"  {s['rank']:>2}. {s['attribute']}")
+        print()
+
     # Scree plot with parallel analysis threshold
     n_show = min(30, num_principles)
     plt.figure(figsize=(10, 5))
@@ -108,23 +139,18 @@ def main(cfg: DictConfig) -> None:
     plt.axvline(x=k, color='gray', linestyle=':', alpha=0.5, label=f'k={k}')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('scree_parallel.png', dpi=150)
-    print("Saved scree_parallel.png")
-
-    # Final list
-    print(f"\nFinal selected principles ({len(selected)}):")
-    for s in selected:
-        print(f"  {s['rank']:>2}. {s['attribute']:<40s} (loading={s['loading']:+.3f})")
+    plt.savefig(npy_path.with_name(npy_path.stem + '_scree.png'), dpi=150)
+    print(f"Saved {npy_path.with_name(npy_path.stem + '_scree.png')}")
 
     # Save
     np.savez(
-        'pca_results.npz',
+        npy_path.with_name(npy_path.stem + '_pca_results.npz'),
         eigenvalues=eigenvalues,
         rotated_loadings=rotated_loadings,
         selected_names=[s['attribute'] for s in selected],
         selected_loadings=[s['loading'] for s in selected],
     )
-    print("\nSaved pca_results.npz")
+    print(f"Saved {npy_path.with_name(npy_path.stem + '_pca_results.npz')}")
 
 
 if __name__ == "__main__":
