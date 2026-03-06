@@ -1,0 +1,6 @@
+defaults:
+  - judge: parsed_glm
+  - _self_
+
+output_path: data/principle_selection/scores_matrix_parsed_glm-4.5-air_1000.npy
+limit: 1000

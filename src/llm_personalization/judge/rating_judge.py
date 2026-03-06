@@ -36,10 +36,14 @@ class RatingJudge(PrincipleJudge):
         model: str,
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.80,
+        judge_system_prompt_template: str = JUDGE_SYSTEM_PROMPT_TEMPLATE,
+        judge_user_template: str = JUDGE_USER_TEMPLATE,
     ):
         self.model = model
         self.tensor_parallel_size = tensor_parallel_size
         self.gpu_memory_utilization = gpu_memory_utilization
+        self.judge_system_prompt_template = judge_system_prompt_template
+        self.judge_user_template = judge_user_template
         
     def _build_score_token_map(self, tokenizer: AutoTokenizer) -> dict[int, int]:
         score_token_map: dict[int, int] = {}
@@ -94,7 +98,6 @@ class RatingJudge(PrincipleJudge):
             self.tokenizer.pad_token = self.tokenizer.eos_token
         
         self.score_token_map = self._build_score_token_map(self.tokenizer)
-        print(f"[RatingJudge] Score token map: {self.score_token_map}")
 
     def unload(self) -> None:
         if self.llm is None:
@@ -136,29 +139,12 @@ class RatingJudge(PrincipleJudge):
             score += i * math.exp(logprob_dict[i]) / total_prob
         return score
 
+    def judge_manual(self, judge_prompts: list[str], return_prob_dicts: bool = False) -> list[float] | tuple[list[float], list[dict[int, float]]]:
+        """
+        Compute the weighted 1-10 score for a list of judge prompts. The judge prompts must already include all the instructions for the judge, including an instruction to output only the score on a scale from 1 to 10, no other text.
+        """
 
-    def judge_principle(self, conversations: list[list[dict[str, str]]], principles: list[str], return_prob_dicts: bool = False) -> list[float] | tuple[list[float], list[dict[int, float]]]:
-        judge_prompts = []
-
-        for messages, principle in zip(conversations, principles):
-            message_string = ""
-            if len(messages) < 2:
-                raise ValueError(f"Conversation has less than 2 messages: {messages}")
-            if messages[-1]["role"] != "assistant" or messages[-2]["role"] != "user":
-                raise ValueError(f"Last message must be an assistant response and the second to last message must be a user prompt.")
-            message_string = ""
-            for message in messages[:-1]:
-                message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
-            system_prompt = JUDGE_SYSTEM_PROMPT_TEMPLATE
-            user_prompt = JUDGE_USER_TEMPLATE.format(conversation=message_string, response=messages[-1]["content"], principle=principle)
-            full_prompt = self.tokenizer.apply_chat_template(
-                [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-                tokenize=False,
-                add_generation_prompt=True,
-                enable_thinking=False,
-            )
-            full_prompt += "1"
-            judge_prompts.append(full_prompt)
+        judge_prompts = [full_prompt + "1" for full_prompt in judge_prompts]
                     
         sampling_params = SamplingParams(max_tokens=1, logprobs=20, prompt_logprobs=20)
         outputs = self.llm.generate(judge_prompts, sampling_params=sampling_params)
@@ -222,107 +208,31 @@ class RatingJudge(PrincipleJudge):
             score = self._compute_weighted_score(logprob_dict)
             scores.append(score)
 
-        assert len(scores) == len(conversations)
+        assert len(scores) == len(judge_prompts)
         if return_prob_dicts:
             return scores, prob_dicts
         return scores
 
-    # def _build_prompt(self, prompt: str, response: str, evaluation_system_prompt: str) -> str:
-    #     range_str = f"{self.range[0]}-{self.range[1]}"
-    #     user_content = JUDGE_USER_TEMPLATE.format(
-    #         range_str=range_str,
-    #         prompt=prompt,
-    #         response=response,
-    #     )
-        
-    #     messages = [
-    #         {"role": "system", "content": evaluation_system_prompt},
-    #         {"role": "user", "content": user_content},
-    #     ]
-        
-    #     return self.tokenizer.apply_chat_template(
-    #         messages,
-    #         tokenize=False,
-    #         add_generation_prompt=True,
-    #         enable_thinking=False,
-    #     )
+    def judge_principle(self, conversations: list[list[dict[str, str]]], principles: list[str], return_prob_dicts: bool = False) -> list[float] | tuple[list[float], list[dict[int, float]]]:
+        judge_prompts = []
 
-    
-
-    # def _compute_weighted_scores(self, outputs: list[RequestOutput]) -> list[float]:
-    #     weighted_scores: list[float] = []
-        
-    #     for output in outputs:
-    #         first_token_logprobs = output.outputs[0].logprobs[0]
-    #         score_probs: list[tuple[int, float]] = []
+        for messages, principle in zip(conversations, principles):
+            message_string = ""
+            if len(messages) < 2:
+                raise ValueError(f"Conversation has less than 2 messages: {messages}")
+            if messages[-1]["role"] != "assistant" or messages[-2]["role"] != "user":
+                raise ValueError(f"Last message must be an assistant response and the second to last message must be a user prompt.")
+            message_string = ""
+            for message in messages[:-1]:
+                message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
+            system_prompt = self.judge_system_prompt_template
+            user_prompt = self.judge_user_template.format(conversation=message_string, response=messages[-1]["content"], principle=principle)
+            full_prompt = self.tokenizer.apply_chat_template(
+                [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            )
+            judge_prompts.append(full_prompt)
             
-    #         for token_id, logprob_obj in first_token_logprobs.items():
-    #             if token_id in self.token_score_map:
-    #                 score = self.token_score_map[token_id]
-    #                 prob = math.exp(logprob_obj.logprob)
-    #                 score_probs.append((score, prob))
-            
-    #         if not score_probs:
-    #             print("Warning: No score tokens found in the generated token.")
-    #             weighted_scores.append(5.0)
-    #             continue
-            
-    #         total_prob = sum(prob for _, prob in score_probs)
-    #         weighted_score = sum(score * prob for score, prob in score_probs) / total_prob
-    #         weighted_scores.append(weighted_score)
-        
-    #     return weighted_scores
-
-    # def judge(self, prompts: list[str], responses: list[str], evaluation_system_prompts: list[str]) -> list[float]:
-    #     formatted_prompts = [
-    #         self._build_prompt(prompt, response, evaluation_system_prompt) 
-    #         for prompt, response, evaluation_system_prompt 
-    #         in zip(prompts, responses, evaluation_system_prompts)
-    #     ]
-    #     sampling_params = SamplingParams(
-    #         temperature=1.0,
-    #         max_tokens=1,
-    #         logprobs=20,
-    #     )
-    #     outputs = self.llm.generate(formatted_prompts, sampling_params)
-    #     weighted_scores = self._compute_weighted_scores(outputs)
-    #     return weighted_scores
-        
-
-    # def judge_manual(self, conversations: list[list[dict[str, str]]]) -> list[float]:
-    #     formatted_messages = [
-    #         self.tokenizer.apply_chat_template(
-    #             messages,
-    #             tokenize=False,
-    #             add_generation_prompt=True,
-    #             enable_thinking=False,
-    #         )
-    #         for messages in conversations
-    #     ]
-
-    #     sampling_params = SamplingParams(
-    #         temperature=1.0,
-    #         max_tokens=1,
-    #         logprobs=20,
-    #     )
-    #     outputs = self.llm.generate(formatted_messages, sampling_params)
-    #     weighted_scores = self._compute_weighted_scores(outputs)
-    #     return weighted_scores
-        
-    # def unload_llm(self) -> None:
-    #     if self.llm is None:
-    #         return
-        
-    #     del self.llm
-    #     del self.tokenizer
-    #     self.llm = None
-    #     self.tokenizer = None
-    #     self.token_score_map = None
-        
-    #     gc.collect()
-        
-    #     if torch.cuda.is_available():
-    #         torch.cuda.empty_cache()
-    #         torch.cuda.synchronize()
-        
-    #     print("Judge model unloaded")
+        return self.judge_manual(judge_prompts, return_prob_dicts)

@@ -1,7 +1,8 @@
 import hydra
 from omegaconf import DictConfig
 import torch
-
+from llm_personalization.judge import YesNoJudge, RatingJudge, PrincipleJudge
+from hydra.utils import instantiate
 
 TEST_PROMPT = "What is the capital of France?"
 TEST_RESPONSE_1 = """
@@ -47,63 +48,35 @@ def print_gpu_info() -> None:
     print("=" * 50)
 
 
-def test_principle_judge(cfg: DictConfig) -> None:
-    from llm_personalization.judge import PrincipleJudge
+def test_judge(judge: PrincipleJudge) -> None:
+    judge.load()
 
-    judge = PrincipleJudge(
-        model=cfg.judge.model,
-        torch_dtype=getattr(torch, cfg.judge.torch_dtype),
-        device_map=cfg.judge.device_map,
-    )
-    judge.load_model()
+    conversations = [
+        [{"role": "user", "content": TEST_PROMPT}, {"role": "assistant", "content": TEST_RESPONSE_1}],
+        [{"role": "user", "content": TEST_PROMPT}, {"role": "assistant", "content": TEST_RESPONSE_2}],
+        [{"role": "user", "content": TEST_PROMPT}, {"role": "assistant", "content": TEST_RESPONSE_3}],
+    ]
 
-    scores = judge.judge(
-        prompts=[TEST_PROMPT, TEST_PROMPT, TEST_PROMPT],
-        responses=[TEST_RESPONSE_1, TEST_RESPONSE_2, TEST_RESPONSE_3],
-        principles=[TEST_PRINCIPLE, TEST_PRINCIPLE, TEST_PRINCIPLE],
-        batch_size=cfg.judge.batch_size,
+    scores = judge.judge_principle(
+        conversations=conversations,
+        principles=[TEST_PRINCIPLE] * len(conversations),
     )
+
     print(f"PrincipleJudge scores (P(Yes)): {scores[0]:.4f}, {scores[1]:.4f}, {scores[2]:.4f}")
-    judge.unload_model()
 
+    if not (0 <= scores[0] < scores[1] < scores[2]):
+        print(f"Scores are not in the expected order.")
 
-def test_rating_judge(cfg: DictConfig) -> None:
-    from llm_personalization.judge import RatingJudge
+    judge.unload()
 
-    judge = RatingJudge(
-        model=cfg.judge.model,
-        tensor_parallel_size=cfg.judge.tensor_parallel_size,
-        gpu_memory_utilization=cfg.judge.gpu_memory_utilization,
-        range=(0, 9),
-    )
-    judge.load_llm()
-
-    SYSTEM_PROMPT = "You are a helpful assistant. Rate the response quality on a scale of 0-9."
-    scores = judge.judge(
-        prompts=[TEST_PROMPT, TEST_PROMPT, TEST_PROMPT],
-        responses=[TEST_RESPONSE_1, TEST_RESPONSE_2, TEST_RESPONSE_3],
-        evaluation_system_prompts=[SYSTEM_PROMPT, SYSTEM_PROMPT, SYSTEM_PROMPT],
-    )
-    # print(f"RatingJudge scores (0-10): {scores[0]:.4f}, {scores[1]:.4f}, {scores[2]:.4f}")
-    print(f"RatingJudge scores (0-9): {scores[0]:.4f}, {scores[1]:.4f}, {scores[2]:.4f}")
-    judge.unload_llm()
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="default")
 def main(cfg: DictConfig) -> None:
     print_gpu_info()
 
-    print(f"\nTesting judge type: {cfg.judge.type}")
-    print(f"Model: {cfg.judge.model}\n")
-
-    if cfg.judge.type == "principle":
-        test_principle_judge(cfg)
-    elif cfg.judge.type == "rating":
-        test_rating_judge(cfg)
-    else:
-        raise ValueError(f"Unknown judge type: {cfg.judge.type}")
-
-    print("\nAll checks passed.")
+    judge = instantiate(cfg.judge)
+    test_judge(judge)
 
 
 if __name__ == "__main__":

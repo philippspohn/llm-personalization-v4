@@ -1,0 +1,7 @@
+_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
+
+model: microsoft/phi-4
+
+enable_thinking: false
+reasoning_max_tokens: 2048
+max_tokens: 4096

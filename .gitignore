@@ -20,7 +20,7 @@ env/
 pip-selfcheck.json
 
 # Data and outputs (usually too large for git)
-data/
+/data/
 outputs/
 results/
 

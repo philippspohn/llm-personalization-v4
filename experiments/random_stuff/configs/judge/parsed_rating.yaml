@@ -1,0 +1,12 @@
+_target_: llm_personalization.judge.ParsedRatingJudge
+
+model: Qwen/Qwen3.5-35B-A3B
+tensor_parallel_size: 2
+gpu_memory_utilization: 0.90
+enable_thinking: true
+temperature: 1.0
+top_p: 0.95
+top_k: 20
+min_p: 0.0
+presence_penalty: 1.5
+repetition_penalty: 1.0

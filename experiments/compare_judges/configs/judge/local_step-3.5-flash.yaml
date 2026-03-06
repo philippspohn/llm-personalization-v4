@@ -1,0 +1,9 @@
+_target_: llm_personalization.judge.ParsedRatingJudge
+
+model: stepfun-ai/Step-3.5-Flash-FP8
+tensor_parallel_size: 2
+gpu_memory_utilization: 0.95
+
+enable_thinking: true
+max_tokens: 4096
+thinking_max_tokens: 2048

@@ -56,12 +56,12 @@ class YesNoJudge(PrincipleJudge):
         print("[PrincipleJudge] Model loaded successfully")
 
     def unload(self) -> None:
-        if self.model is None:
+        if self.llm is None:
             return
-        
-        del self.model
+
+        del self.llm
         del self.tokenizer
-        self.model = None
+        self.llm = None
         self.tokenizer = None
         
         gc.collect()

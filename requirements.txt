@@ -13,5 +13,11 @@ omegaconf
 
 # Utilities
 pyyaml
+numpy
+pandas
+tqdm
 
 matplotlib
+scipy
+factor_analyzer
+seaborn

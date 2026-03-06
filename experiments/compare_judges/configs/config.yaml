@@ -1,0 +1,25 @@
+judges:
+  # - glm-4.5-air
+  # - glm-4.7-flash
+  # - gpt-oss-20b
+  # - gpt-oss-120b
+  # - kimi-k2.5 ////
+  # - minimax-m2.5
+  # - qwen3.5-27b
+  # - qwen3.5-35b-a3b
+  # - qwen3.5-122b-a10b
+  # - qwen3.5-397b-a17b
+  # - step-3.5-flash
+  # - phi-4
+  # - gemma-3-27b-it_no-thinking
+  # - phi-4_no-thinking
+  # - qwen3.5-27b_no-thinking
+  # - mimo-v2-flash
+  # - local_step-3.5-flash
+  # - weighted_phi-4
+  # - weighted_gemma-3-27b-it
+  # - weighted_qwen3.5-27b
+  # - gpt-5.4
+  # - gemini-3-flash-preview
+  # - gemini-3.1-pro-preview
+  - claude-4.6-opus

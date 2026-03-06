@@ -1,0 +1,11 @@
+_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
+
+model: stepfun/step-3.5-flash
+temperature: 1.0
+top_p: 0.95
+
+enable_thinking: true
+reasoning_max_tokens: 2048
+max_tokens: 4096
+max_concurrent_requests: 20
+request_delay: 0.5
