@@ -1,0 +1,578 @@
+{
+  "method": "hierarchical",
+  "setting": "k=32",
+  "k": 32,
+  "groups": [
+    {
+      "representative": "sardonic",
+      "members": [
+        "sardonic",
+        "satirical",
+        "quirky",
+        "snark",
+        "witty",
+        "irreverent",
+        "gossipy",
+        "banter",
+        "whimsical",
+        "humorless",
+        "surreal",
+        "humorous",
+        "stream of consciousness",
+        "pompous",
+        "mysterious",
+        "ironic",
+        "unconventional",
+        "pretentious",
+        "asks clarifying questions",
+        "confrontational",
+        "playful",
+        "campy",
+        "contrarian",
+        "tests understanding with questions",
+        "subtle wit",
+        "meme-fluent",
+        "pedantic",
+        "interrogative",
+        "sarcastic",
+        "experimental",
+        "salesy",
+        "preachy",
+        "gamified",
+        "transgressive",
+        "cynicism",
+        "includes a TL;DR",
+        "aphoristic",
+        "sycophantic",
+        "unstructured",
+        "flowery",
+        "aggressive",
+        "nagging",
+        "paternalistic",
+        "quote-heavy",
+        "condescending"
+      ]
+    },
+    {
+      "representative": "provocative",
+      "members": [
+        "provocative",
+        "thought-provoking",
+        "imaginative",
+        "novel framings",
+        "creative",
+        "inquisitiveness",
+        "philosophical",
+        "analogical",
+        "opinionated",
+        "shows tradeoffs",
+        "originality",
+        "argumentative",
+        "allegorical",
+        "exploratory",
+        "intellectually curious",
+        "oratorical",
+        "comparative",
+        "reframing",
+        "sprawling",
+        "euphemistic",
+        "challenges mainstream narratives",
+        "risk-framing",
+        "long-winded",
+        "speculative",
+        "meandering"
+      ]
+    },
+    {
+      "representative": "shows only the final answer",
+      "members": [
+        "shows only the final answer",
+        "refuses when unsure",
+        "wishy-washy",
+        "tangential",
+        "alarmist",
+        "anti-intellectual",
+        "naive",
+        "uses the user's name",
+        "parochial",
+        "repetitive",
+        "over-explains",
+        "hand-wavy",
+        "evasive",
+        "attempts an answer when uncertain",
+        "over-qualifies statements",
+        "corporate jargon",
+        "talks up to the reader",
+        "speaks in absolutes",
+        "under-explains",
+        "spoon-feeding",
+        "profane",
+        "shitposting",
+        "dark humor"
+      ]
+    },
+    {
+      "representative": "by-the-book",
+      "members": [
+        "by-the-book",
+        "scope-limiting",
+        "conservative",
+        "literal language",
+        "validating",
+        "unfiltered",
+        "measured",
+        "professional",
+        "active listening",
+        "predictable",
+        "earnest",
+        "sticks to conventional wisdom",
+        "agreeable",
+        "low-context",
+        "balanced",
+        "treats every message as standalone",
+        "sanitized",
+        "unpretentious",
+        "normalizing",
+        "egalitarian",
+        "reinforces mainstream narratives"
+      ]
+    },
+    {
+      "representative": "visceral",
+      "members": [
+        "visceral",
+        "personality-forward",
+        "passionate",
+        "melodramatic",
+        "dramatic",
+        "urgency-inducing",
+        "flamboyant",
+        "suspenseful",
+        "hyperbolic",
+        "idiom-heavy",
+        "zealous",
+        "bombastic",
+        "grandiose",
+        "intuition-driven",
+        "enthusiastic",
+        "anecdotal",
+        "nostalgic",
+        "intimate",
+        "uses text emphasis",
+        "tabloid-style"
+      ]
+    },
+    {
+      "representative": "matter-of-fact",
+      "members": [
+        "matter-of-fact",
+        "emotionally neutral",
+        "dispassionate",
+        "appeals to emotion",
+        "detached",
+        "journalistic",
+        "clinical",
+        "dry",
+        "encyclopedic",
+        "objective",
+        "deadpan",
+        "understated",
+        "stoic",
+        "impersonal",
+        "personality-neutral",
+        "academic",
+        "serious",
+        "formal",
+        "gravitas"
+      ]
+    },
+    {
+      "representative": "acknowledges uncertainty",
+      "members": [
+        "acknowledges uncertainty",
+        "hedged and cautious",
+        "includes caveats",
+        "confessional",
+        "cautionary",
+        "probabilistic",
+        "indirect",
+        "acknowledges its own biases",
+        "metacommentary",
+        "self-deprecating",
+        "challenges user assumptions",
+        "admits mistakes readily",
+        "uses \"it depends\"",
+        "hyper-skeptical",
+        "introspective",
+        "pushes back",
+        "acknowledges being an AI",
+        "apologetic",
+        "never mentions being an AI"
+      ]
+    },
+    {
+      "representative": "audience-adaptive",
+      "members": [
+        "audience-adaptive",
+        "polished",
+        "progressive framing",
+        "incremental",
+        "scaffolded",
+        "progressive disclosure",
+        "defers to the user",
+        "patient and unhurried",
+        "human-like",
+        "trusts the user's judgment",
+        "diplomatic",
+        "context-first",
+        "sensitivity",
+        "rhythmic",
+        "register-mirroring",
+        "remembers and references prior context"
+      ]
+    },
+    {
+      "representative": "uses code snippets",
+      "members": [
+        "uses code snippets",
+        "uses mnemonics",
+        "polemic",
+        "Gen Z slang",
+        "socratic questioning",
+        "archaic vocabulary",
+        "uses tables",
+        "adds safety warnings",
+        "permission-seeking",
+        "machiavellian",
+        "constructive criticism",
+        "defensive",
+        "techno-skeptical",
+        "relies on folk wisdom"
+      ]
+    },
+    {
+      "representative": "granular detail",
+      "members": [
+        "granular detail",
+        "specificity",
+        "concrete",
+        "thorough",
+        "rigorous",
+        "zoomed-in",
+        "exhaustiveness",
+        "comprehensiveness",
+        "dense",
+        "authoritative",
+        "incisive",
+        "trenchant",
+        "breadth-oriented"
+      ]
+    },
+    {
+      "representative": "bullet-heavy",
+      "members": [
+        "bullet-heavy",
+        "uses numbered lists",
+        "uses minimal formatting",
+        "lays out options without recommending",
+        "heavy markdown formatting",
+        "modular organization",
+        "signposting",
+        "structured",
+        "uses headers",
+        "teacher-to-student tone",
+        "didactic",
+        "plain text",
+        "analytical structure"
+      ]
+    },
+    {
+      "representative": "depth-oriented",
+      "members": [
+        "depth-oriented",
+        "elaborate",
+        "provides extensive context and background",
+        "nuanced",
+        "elevated",
+        "scope-expanding",
+        "superlative",
+        "discursive",
+        "verbose",
+        "deliberative",
+        "initiative-taking",
+        "anticipates follow-up questions",
+        "risk-tolerant"
+      ]
+    },
+    {
+      "representative": "warm",
+      "members": [
+        "warm",
+        "friendly",
+        "motivational",
+        "cheerful",
+        "empathetic",
+        "celebratory",
+        "encouraging",
+        "sympathetic",
+        "aloof",
+        "flattering",
+        "optimistic",
+        "appeals to intuition"
+      ]
+    },
+    {
+      "representative": "conversational",
+      "members": [
+        "conversational",
+        "interactive",
+        "collaborative",
+        "peer-to-peer tone",
+        "spontaneous",
+        "partnership-oriented",
+        "mentor tone",
+        "casual",
+        "roleplay actions",
+        "colloquial",
+        "breezy",
+        "eli5"
+      ]
+    },
+    {
+      "representative": "minimalist",
+      "members": [
+        "minimalist",
+        "terse",
+        "concise",
+        "staccato",
+        "elliptical",
+        "blunt",
+        "prose-heavy",
+        "reductive",
+        "uses short sentences",
+        "uses long flowing sentences",
+        "monologue-style"
+      ]
+    },
+    {
+      "representative": "principle-driven",
+      "members": [
+        "principle-driven",
+        "deontological framing",
+        "rules-first",
+        "deferential",
+        "risk-averse",
+        "assumes no prior knowledge",
+        "globally inclusive perspective",
+        "traditionalist framing",
+        "culturally sensitive",
+        "humble",
+        "brand-neutral"
+      ]
+    },
+    {
+      "representative": "theoretical",
+      "members": [
+        "theoretical",
+        "abstract",
+        "futuristic",
+        "interdisciplinary",
+        "generality",
+        "high-level overview",
+        "worldly",
+        "cosmopolitan",
+        "historical framing",
+        "patriotic",
+        "locale-aware"
+      ]
+    },
+    {
+      "representative": "answers only what was asked",
+      "members": [
+        "answers only what was asked",
+        "stays narrowly on topic",
+        "service-oriented",
+        "self-contained",
+        "direct",
+        "reactive only",
+        "consequentialist",
+        "solution-oriented",
+        "transactional",
+        "pragmatic",
+        "platitude-heavy"
+      ]
+    },
+    {
+      "representative": "persuasiveness",
+      "members": [
+        "persuasiveness",
+        "elegant prose",
+        "high-context",
+        "robotic",
+        "approximate",
+        "big-picture",
+        "reverent",
+        "open-mindedness",
+        "presents multiple perspectives",
+        "formulaic"
+      ]
+    },
+    {
+      "representative": "self-assured",
+      "members": [
+        "self-assured",
+        "unapologetic",
+        "assertive",
+        "decisive",
+        "no meta-commentary",
+        "commits to one answer",
+        "absolute certainty",
+        "omits caveats",
+        "hides reasoning"
+      ]
+    },
+    {
+      "representative": "first-principles thinking",
+      "members": [
+        "first-principles thinking",
+        "syllogistic",
+        "critical",
+        "diagnostic",
+        "visible chain-of-thought",
+        "transparent reasoning",
+        "devil's advocate",
+        "tough-love",
+        "pessimistic"
+      ]
+    },
+    {
+      "representative": "Q&A format",
+      "members": [
+        "Q&A format",
+        "dialogue-driven",
+        "bottom-line-up-front",
+        "inverted pyramid structure",
+        "answer-first",
+        "assistant-to-boss tone",
+        "de-escalating",
+        "western-centric perspective"
+      ]
+    },
+    {
+      "representative": "wholesome",
+      "members": [
+        "wholesome",
+        "reassuring",
+        "gentle",
+        "kid-safe",
+        "calming",
+        "conflict-avoidant",
+        "comforting",
+        "pastoral"
+      ]
+    },
+    {
+      "representative": "prescriptive",
+      "members": [
+        "prescriptive",
+        "gives specific recommendations",
+        "suggests next steps",
+        "action-oriented",
+        "imperative",
+        "empowering",
+        "libertarian framing",
+        "opportunity-framing"
+      ]
+    },
+    {
+      "representative": "shows worked examples",
+      "members": [
+        "shows worked examples",
+        "example-driven",
+        "step-by-step",
+        "chronological structure",
+        "question-restating",
+        "varies sentence length",
+        "builds up to the conclusion",
+        "politeness"
+      ]
+    },
+    {
+      "representative": "data-driven",
+      "members": [
+        "data-driven",
+        "evidence-based",
+        "technical",
+        "ruthless",
+        "distinguishes fact from opinion",
+        "hyper-literal",
+        "states opinions as opinions"
+      ]
+    },
+    {
+      "representative": "no emojis",
+      "members": [
+        "no emojis",
+        "uses emojis",
+        "never asks questions",
+        "declarative",
+        "indifferent to the user",
+        "first-person narrative",
+        "anthropomorphic"
+      ]
+    },
+    {
+      "representative": "poetic",
+      "members": [
+        "poetic",
+        "lyrical",
+        "romantic",
+        "metaphorical language",
+        "imagery-heavy",
+        "cinematic descriptions",
+        "sensory-rich"
+      ]
+    },
+    {
+      "representative": "jargon-heavy",
+      "members": [
+        "jargon-heavy",
+        "layperson-friendly",
+        "esoteric",
+        "assumes expert knowledge",
+        "simple language",
+        "sophisticated vocabulary"
+      ]
+    },
+    {
+      "representative": "morally neutral",
+      "members": [
+        "morally neutral",
+        "morally opinionated",
+        "non-judgmental",
+        "virtue-signaling",
+        "neutral",
+        "refuses to pick a side"
+      ]
+    },
+    {
+      "representative": "self-aware humor",
+      "members": [
+        "self-aware humor",
+        "uses blockquotes",
+        "uses rhetorical questions",
+        "absurdist humor",
+        "dad jokes",
+        "pop-culture reference heavy"
+      ]
+    },
+    {
+      "representative": "appeals to authority",
+      "members": [
+        "appeals to authority",
+        "cites sources",
+        "omits citations"
+      ]
+    }
+  ]
+}

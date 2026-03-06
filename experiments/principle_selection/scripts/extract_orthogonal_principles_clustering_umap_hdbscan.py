@@ -4,6 +4,7 @@ from candidate_principles import candidate_principles
 from hydra.utils import get_original_cwd
 import numpy as np
 from pathlib import Path
+import json
 import matplotlib.pyplot as plt
 import umap
 from sklearn.cluster import HDBSCAN
@@ -74,6 +75,16 @@ def main(cfg: DictConfig) -> None:
         if len(noise_indices):
             print(f"  [noise: {', '.join(principle_names[noise_indices[:8]])}{'...' if len(noise_indices) > 8 else ''}]")
         print()
+
+        groups = []
+        for s in selected:
+            rep_idx = list(principle_names).index(s['attribute'])
+            indices = np.array([list(principle_names).index(m) for m in s['members']])
+            order = indices[np.argsort(-abs_corr[rep_idx][indices])]
+            groups.append({'representative': s['attribute'], 'members': [principle_names[i] for i in order]})
+        json_path = npy_path.with_name(npy_path.stem + f'_groups_umap_hdbscan_mcs{min_cluster_size}.json')
+        json_path.write_text(json.dumps({'method': 'umap_hdbscan', 'setting': f'mcs={min_cluster_size}', 'k': n_clusters, 'groups': groups}, indent=2))
+        print(f"Saved {json_path}")
 
         if best_labels is None or n_clusters > len(set(best_labels) - {-1}):
             best_labels = labels

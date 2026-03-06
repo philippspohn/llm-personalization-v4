@@ -5,6 +5,7 @@ from hydra.utils import get_original_cwd
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
+import json
 
 
 def varimax(loadings, max_iter=100, tol=1e-6):
@@ -127,6 +128,36 @@ def main(cfg: DictConfig) -> None:
         for s in subset:
             print(f"  {s['rank']:>2}. {s['attribute']}")
         print()
+
+    # Save JSON for each budget
+    def build_pca_groups(budget):
+        rl = rotated_loadings[:, :budget]
+        assignments = np.argmax(np.abs(rl), axis=1)
+        groups = []
+        for comp_idx in range(budget):
+            indices = np.where(assignments == comp_idx)[0]
+            if len(indices) == 0:
+                continue
+            order = indices[np.argsort(-np.abs(rl[indices, comp_idx]))]
+            rep_loading = float(np.abs(rl[order[0], comp_idx]))
+            groups.append({
+                'representative': principle_names[order[0]],
+                'members': [principle_names[i] for i in order],
+                '_rep_loading': rep_loading,
+            })
+        groups.sort(key=lambda g: -g['_rep_loading'])
+        for g in groups:
+            del g['_rep_loading']
+        return groups
+
+    for budget in [4, 8, 16, k, 32]:
+        if budget > k:
+            continue
+        groups = build_pca_groups(budget)
+        out = {'method': 'pca', 'setting': f'k={budget}', 'k': budget, 'groups': groups}
+        json_path = npy_path.with_name(npy_path.stem + f'_groups_pca_k{budget}.json')
+        json_path.write_text(json.dumps(out, indent=2))
+        print(f"Saved {json_path}")
 
     # Scree plot with parallel analysis threshold
     n_show = min(30, num_principles)

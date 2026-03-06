@@ -4,6 +4,7 @@ from candidate_principles import candidate_principles
 from hydra.utils import get_original_cwd
 import numpy as np
 from pathlib import Path
+import json
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 from scipy.spatial.distance import squareform
@@ -71,6 +72,17 @@ def main(cfg: DictConfig) -> None:
             intra_str = f"{s['intra']:.3f}" if not np.isnan(s['intra']) else "   — "
             print(f"  {s['attribute']:<40s} {s['size']:>4}  {intra_str:>6}  {s['inter']:>6.3f}")
         print()
+
+        groups = []
+        for s in selected:
+            indices = s['indices']
+            rep_name = s['attribute']
+            rep_idx = list(principle_names).index(rep_name)
+            order = indices[np.argsort(-abs_corr[rep_idx][indices])]
+            groups.append({'representative': rep_name, 'members': [principle_names[i] for i in order]})
+        json_path = npy_path.with_name(npy_path.stem + f'_groups_hierarchical_k{budget}.json')
+        json_path.write_text(json.dumps({'method': 'hierarchical', 'setting': f'k={budget}', 'k': budget, 'groups': groups}, indent=2))
+        print(f"Saved {json_path}")
 
     # Dendrogram
     plt.figure(figsize=(20, 8))
