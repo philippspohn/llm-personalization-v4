@@ -34,7 +34,10 @@ def main(cfg: DictConfig) -> None:
     npy_path = Path(get_original_cwd()) / cfg.output_path
     scores_matrix = np.load(npy_path)
     num_conversations, num_principles = scores_matrix.shape
-    principle_names = candidate_principles
+    principle_names = list(cfg.candidate_principles)
+    print(f"First 5 principles: {principle_names[:5]}")
+    if len(principle_names) != num_principles:
+        raise ValueError(f"Number of principles in config ({len(principle_names)}) does not match number of principles in scores matrix ({num_principles})")
 
     # Standardize
     scores_std = (scores_matrix - scores_matrix.mean(axis=0)) / (scores_matrix.std(axis=0) + 1e-8)
@@ -67,7 +70,7 @@ def main(cfg: DictConfig) -> None:
         best_attr_idx = np.argmax(np.abs(rotated_loadings[:, comp_idx]))
         selected.append({
             'component': comp_idx + 1,
-            'eigenvalue': eigenvalues[comp_idx],
+            'eigenvalue': float(np.sum(rotated_loadings[:, comp_idx] ** 2)),
             'attribute': principle_names[best_attr_idx],
             'loading': rotated_loadings[best_attr_idx, comp_idx],
             'top5': sorted(

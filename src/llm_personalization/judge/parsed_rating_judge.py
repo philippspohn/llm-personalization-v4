@@ -10,6 +10,11 @@ from .judge import PrincipleJudge
 JUDGE_SYSTEM_PROMPT_TEMPLATE = """
 You are an expert, impartial evaluator. Your task is to evaluate the provided text based strictly on the provided principle on a scale from 1 to 10. Output only the score, no other text."""
 
+JUDGE_SYSTEM_PROMPT_TEMPLATE_THINKING = """
+You are an expert, impartial evaluator. Your task is to evaluate the provided text based strictly on the provided principle on a scale from 1 to 10.
+
+You must first use your internal thinking process to reason through the evaluation step-by-step. Once your reasoning is complete, your final visible output must be ONLY the numeric score (1-10), with absolutely no other words, punctuation, or text."""
+
 JUDGE_USER_TEMPLATE = """
 Please evaluate the following interaction:
 
@@ -35,18 +40,18 @@ class ParsedRatingJudge(PrincipleJudge):
         model: str,
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.80,
-        judge_system_prompt_template: str = JUDGE_SYSTEM_PROMPT_TEMPLATE,
+        judge_system_prompt_template: str = "default",
         judge_user_template: str = JUDGE_USER_TEMPLATE,
         enable_thinking: bool = False,
         max_tokens: int = 4,
         thinking_max_tokens: int = 2048,
         force_rating_on_thinking_timeout: bool = True,
-        temperature: float = 0.0,
-        top_p: float = 1.0,
-        top_k: int = -1,
-        min_p: float = 0.0,
-        presence_penalty: float = 0.0,
-        repetition_penalty: float = 1.0,
+        temperature: float | None = None,
+        top_p: float | None = None,
+        top_k: int | None = None,
+        min_p: float | None = None,
+        presence_penalty: float | None = None,
+        repetition_penalty: float | None = None,
     ):
         self.model = model
         self.tensor_parallel_size = tensor_parallel_size
@@ -63,6 +68,10 @@ class ParsedRatingJudge(PrincipleJudge):
         self.min_p = min_p
         self.presence_penalty = presence_penalty
         self.repetition_penalty = repetition_penalty
+        if judge_system_prompt_template == "default" and enable_thinking:
+            self.judge_system_prompt_template = JUDGE_SYSTEM_PROMPT_TEMPLATE_THINKING
+        else:
+            self.judge_system_prompt_template = JUDGE_SYSTEM_PROMPT_TEMPLATE
         
     def _detect_think_end_token(self) -> str | None:
         """Auto-detect the end-of-thinking token from the tokenizer's vocabulary."""
@@ -134,15 +143,20 @@ class ParsedRatingJudge(PrincipleJudge):
         return self.think_end_token is not None and self.think_end_token in output.outputs[0].text
 
     def _build_sampling_params(self, max_tokens: int) -> SamplingParams:
-        return SamplingParams(
-            max_tokens=max_tokens,
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            min_p=self.min_p,
-            presence_penalty=self.presence_penalty,
-            repetition_penalty=self.repetition_penalty,
-        )
+        kwargs = {"max_tokens": max_tokens}
+        if self.temperature is not None:
+            kwargs["temperature"] = self.temperature
+        if self.top_p is not None:
+            kwargs["top_p"] = self.top_p
+        if self.top_k is not None:
+            kwargs["top_k"] = self.top_k
+        if self.min_p is not None:
+            kwargs["min_p"] = self.min_p
+        if self.presence_penalty is not None:
+            kwargs["presence_penalty"] = self.presence_penalty
+        if self.repetition_penalty is not None:
+            kwargs["repetition_penalty"] = self.repetition_penalty
+        return SamplingParams(**kwargs)
 
     def _extract_reasoning(self, output: RequestOutput) -> str:
         """Extract the reasoning/thinking portion from model output."""
@@ -155,6 +169,10 @@ class ParsedRatingJudge(PrincipleJudge):
         max_tokens = self.thinking_max_tokens if self.enable_thinking else self.max_tokens
         sampling_params = self._build_sampling_params(max_tokens)
         outputs = self.llm.generate(judge_prompts, sampling_params=sampling_params)
+        for i in range(3):
+            print("=" * 100)
+            print(f"[ParsedRatingJudge] Output {i}: {outputs[i].outputs[0].text}")
+            print("=" * 100)
 
         reasoning_texts = [self._extract_reasoning(o) for o in outputs] if return_reasoning else None
 

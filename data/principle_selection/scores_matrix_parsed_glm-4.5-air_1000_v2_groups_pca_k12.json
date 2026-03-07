@@ -1,0 +1,179 @@
+{
+  "method": "pca",
+  "setting": "k=12",
+  "k": 12,
+  "groups": [
+    {
+      "representative": "appeals to emotion",
+      "members": [
+        "appeals to emotion",
+        "emotionally neutral",
+        "clinical",
+        "stoic",
+        "academic",
+        "dry",
+        "indifferent",
+        "teacher-to-student tone",
+        "formal",
+        "analytical",
+        "didactic",
+        "serious",
+        "warm",
+        "assumes expert knowledge",
+        "appeals to authority",
+        "speculative"
+      ]
+    },
+    {
+      "representative": "prescriptive",
+      "members": [
+        "prescriptive",
+        "gives specific recommendations",
+        "action-oriented",
+        "heavy formatting",
+        "minimal formatting",
+        "high-level",
+        "adds safety warnings"
+      ]
+    },
+    {
+      "representative": "concrete",
+      "members": [
+        "concrete",
+        "granular",
+        "exhaustive",
+        "example-driven",
+        "authoritative",
+        "service-oriented",
+        "confident",
+        "first-principles",
+        "stays narrowly on topic",
+        "distinguishes fact from opinion",
+        "pragmatic",
+        "validating",
+        "evidence-based",
+        "transactional",
+        "patient",
+        "neutral"
+      ]
+    },
+    {
+      "representative": "acknowledges uncertainty",
+      "members": [
+        "acknowledges uncertainty",
+        "self-aware",
+        "challenges user assumptions",
+        "admits mistakes readily",
+        "hedged",
+        "acknowledges being an AI",
+        "no meta-commentary",
+        "self-deprecating",
+        "cautious",
+        "humble",
+        "tough-love"
+      ]
+    },
+    {
+      "representative": "conversational",
+      "members": [
+        "conversational",
+        "collaborative",
+        "peer-to-peer tone",
+        "interactive",
+        "empathetic",
+        "colloquial",
+        "defers to the user",
+        "deferential",
+        "risk-tolerant",
+        "diplomatic"
+      ]
+    },
+    {
+      "representative": "playful",
+      "members": [
+        "playful",
+        "irreverent",
+        "humorous",
+        "sarcastic",
+        "pompous",
+        "absurdist",
+        "enthusiastic",
+        "provocative",
+        "contrarian",
+        "asks clarifying questions",
+        "pushes back",
+        "intuition-driven",
+        "casual",
+        "aggressive"
+      ]
+    },
+    {
+      "representative": "verbose",
+      "members": [
+        "verbose",
+        "elaborate",
+        "prose-heavy",
+        "concise",
+        "depth-oriented",
+        "terse",
+        "step-by-step",
+        "blunt",
+        "transparent reasoning",
+        "persuasive",
+        "proactive",
+        "monologue-style"
+      ]
+    },
+    {
+      "representative": "simple language",
+      "members": [
+        "simple language",
+        "sophisticated vocabulary",
+        "jargon-heavy",
+        "assumes no prior knowledge",
+        "tangential"
+      ]
+    },
+    {
+      "representative": "presents multiple perspectives",
+      "members": [
+        "presents multiple perspectives",
+        "breadth-oriented",
+        "permissive",
+        "commits to one answer"
+      ]
+    },
+    {
+      "representative": "reassuring",
+      "members": [
+        "reassuring",
+        "calming",
+        "optimistic",
+        "gentle",
+        "cheerful",
+        "pessimistic"
+      ]
+    },
+    {
+      "representative": "uses code snippets",
+      "members": [
+        "uses code snippets",
+        "morally opinionated",
+        "socratic",
+        "opinionated",
+        "non-judgmental",
+        "uses tables",
+        "speaks in absolutes"
+      ]
+    },
+    {
+      "representative": "earnest",
+      "members": [
+        "earnest",
+        "professional",
+        "abstract",
+        "conservative"
+      ]
+    }
+  ]
+}
