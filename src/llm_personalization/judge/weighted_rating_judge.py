@@ -4,30 +4,11 @@ from transformers import AutoTokenizer
 import gc
 import torch
 import math
-from .judge import PrincipleJudge
+from .judge import AttributeJudge
+from .prompt_templates import JUDGE_SYSTEM_PROMPT, JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE, JUDGE_USER_TEMPLATE_PROMPT_ATTRIBUTE
 
 
-JUDGE_SYSTEM_PROMPT_TEMPLATE = """
-You are an expert, impartial evaluator. Your task is to evaluate the provided text based strictly on the provided principle on a scale from 1 to 10. Output only the score, no other text."""
-
-JUDGE_USER_TEMPLATE = """
-Please evaluate the following interaction:
-
-<conversation>
-{conversation}
-</conversation>
-<ai_response_to_evaluate>
-{response}
-</ai_response_to_evaluate>
-<principle>
-{principle}
-</principle>
-
-How well does the response satisfy the principle?
-Your evaluation (1-10):"""
-
-
-class RatingJudge(PrincipleJudge):
+class WeightedRatingJudge(AttributeJudge):
     llm: None | LLM = None
     tokenizer: None | AutoTokenizer = None
     simple_tokenization = False
@@ -36,14 +17,10 @@ class RatingJudge(PrincipleJudge):
         model: str,
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.80,
-        judge_system_prompt_template: str = JUDGE_SYSTEM_PROMPT_TEMPLATE,
-        judge_user_template: str = JUDGE_USER_TEMPLATE,
     ):
         self.model = model
         self.tensor_parallel_size = tensor_parallel_size
         self.gpu_memory_utilization = gpu_memory_utilization
-        self.judge_system_prompt_template = judge_system_prompt_template
-        self.judge_user_template = judge_user_template
         
     def _build_score_token_map(self, tokenizer: AutoTokenizer) -> dict[int, int]:
         score_token_map: dict[int, int] = {}
@@ -115,7 +92,7 @@ class RatingJudge(PrincipleJudge):
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
         
-        print("[RatingJudge] Judge model unloaded")
+        print("[WeightedRatingJudge] Judge model unloaded")
 
 
     def _log_add_exp(self, x, y):
@@ -213,10 +190,10 @@ class RatingJudge(PrincipleJudge):
             return scores, prob_dicts
         return scores
 
-    def judge_principle(self, conversations: list[list[dict[str, str]]], principles: list[str], return_prob_dicts: bool = False) -> list[float] | tuple[list[float], list[dict[int, float]]]:
+    def judge_response_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str], return_prob_dicts: bool = False) -> list[float] | tuple[list[float], list[dict[int, float]]]:
         judge_prompts = []
 
-        for messages, principle in zip(conversations, principles):
+        for messages, attribute in zip(conversations, attributes):
             message_string = ""
             if len(messages) < 2:
                 raise ValueError(f"Conversation has less than 2 messages: {messages}")
@@ -225,8 +202,8 @@ class RatingJudge(PrincipleJudge):
             message_string = ""
             for message in messages[:-1]:
                 message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
-            system_prompt = self.judge_system_prompt_template
-            user_prompt = self.judge_user_template.format(conversation=message_string, response=messages[-1]["content"], principle=principle)
+            system_prompt = JUDGE_SYSTEM_PROMPT
+            user_prompt = JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE.format(conversation=message_string, response=messages[-1]["content"], attribute=attribute)
             full_prompt = self.tokenizer.apply_chat_template(
                 [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
                 tokenize=False,

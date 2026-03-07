@@ -39,11 +39,34 @@ def main(cfg: DictConfig) -> None:
     if len(principle_names) != num_principles:
         raise ValueError(f"Number of principles in config ({len(principle_names)}) does not match number of principles in scores matrix ({num_principles})")
 
-    # Standardize
-    scores_std = (scores_matrix - scores_matrix.mean(axis=0)) / (scores_matrix.std(axis=0) + 1e-8)
+    # Handle NaN (e.g. from parse failures): replace with column mean
+    if np.isnan(scores_matrix).any():
+        col_mean = np.nanmean(scores_matrix, axis=0)
+        for j in range(num_principles):
+            mask = np.isnan(scores_matrix[:, j])
+            if mask.any():
+                scores_matrix[mask, j] = col_mean[j]
+        print(f"Warning: Replaced NaN values with column means")
 
-    # PCA via eigendecomposition of correlation matrix
-    corr_matrix = np.corrcoef(scores_std, rowvar=False)
+    # Standardize (avoid div-by-zero: use 1.0 when std is negligible)
+    col_std = np.nanstd(scores_matrix, axis=0)
+    col_std = np.where(col_std > 1e-10, col_std, 1.0)
+    scores_std = (scores_matrix - np.nanmean(scores_matrix, axis=0)) / col_std
+    # Replace zero-variance columns (originally constant) with small noise so they don't break correlation
+    zero_var = scores_matrix.std(axis=0) <= 1e-10
+    if zero_var.any():
+        zero_names = [principle_names[i] for i in np.where(zero_var)[0]]
+        print(f"Warning: {zero_var.sum()} principle(s) have zero variance: {zero_names[:5]}{'...' if len(zero_names) > 5 else ''}")
+        np.random.seed(42)
+        scores_std[:, zero_var] = np.random.randn(num_conversations, zero_var.sum())  # unit variance for corr matrix
+
+    # Correlation matrix from standardized data: corr = (X.T @ X) / (n-1), avoids np.corrcoef div-by-zero
+    scores_std = np.asarray(scores_std, dtype=np.float64)
+    n_eff = num_conversations - 1
+    corr_matrix = (scores_std.T @ scores_std) / n_eff
+    np.fill_diagonal(corr_matrix, 1.0)  # ensure diagonal is exactly 1
+    if np.isnan(corr_matrix).any() or np.isinf(corr_matrix).any():
+        raise ValueError("Correlation matrix contains NaN/Inf. Check for invalid or constant columns in scores.")
     eigenvalues, eigenvectors = np.linalg.eigh(corr_matrix)
     eigenvalues = eigenvalues[::-1]
     eigenvectors = eigenvectors[:, ::-1]
@@ -56,7 +79,7 @@ def main(cfg: DictConfig) -> None:
         random_corr = np.corrcoef(random_data, rowvar=False)
         random_eigenvalues[i] = np.sort(np.linalg.eigh(random_corr)[0])[::-1]
     threshold = np.percentile(random_eigenvalues, 95, axis=0)
-    k = int(np.sum(eigenvalues > threshold))
+    k = max(1, int(np.sum(eigenvalues > threshold)))  # at least 1 component
 
     # Loadings: eigenvectors scaled by sqrt(eigenvalue)
     loadings = eigenvectors[:, :k] * np.sqrt(eigenvalues[:k])

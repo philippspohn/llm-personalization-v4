@@ -1,0 +1,10 @@
+
+judges:
+
+
+
+limit: 50
+pairs:
+- ["verbose", "terse"]
+- ["formal", "casual"]
+- ["warm", "cold"]

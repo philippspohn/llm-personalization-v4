@@ -1,0 +1,149 @@
+{
+  "method": "pca",
+  "setting": "k=6",
+  "k": 6,
+  "groups": [
+    {
+      "representative": "warm",
+      "members": [
+        "warm",
+        "dry",
+        "empathetic",
+        "cheerful",
+        "emotionally neutral",
+        "clinical",
+        "playful",
+        "enthusiastic",
+        "reassuring",
+        "formal",
+        "colloquial",
+        "casual",
+        "indifferent",
+        "peer-to-peer tone",
+        "optimistic",
+        "provocative",
+        "morally opinionated",
+        "absurdist"
+      ]
+    },
+    {
+      "representative": "acknowledges being an AI",
+      "members": [
+        "acknowledges being an AI",
+        "challenges user assumptions",
+        "no meta-commentary",
+        "acknowledges uncertainty",
+        "pushes back",
+        "pessimistic",
+        "permissive",
+        "self-aware",
+        "stoic",
+        "assumes expert knowledge",
+        "transparent reasoning",
+        "tough-love",
+        "diplomatic",
+        "speaks in absolutes",
+        "socratic"
+      ]
+    },
+    {
+      "representative": "conservative",
+      "members": [
+        "conservative",
+        "professional",
+        "cautious",
+        "validating",
+        "service-oriented",
+        "authoritative",
+        "transactional",
+        "serious",
+        "defers to the user",
+        "earnest",
+        "humble",
+        "evidence-based",
+        "pragmatic",
+        "assumes no prior knowledge",
+        "high-level",
+        "deferential",
+        "admits mistakes readily",
+        "neutral",
+        "exhaustive",
+        "patient",
+        "confident",
+        "didactic",
+        "first-principles",
+        "speculative",
+        "breadth-oriented",
+        "commits to one answer",
+        "abstract",
+        "risk-tolerant",
+        "uses tables",
+        "adds safety warnings",
+        "aggressive",
+        "tangential"
+      ]
+    },
+    {
+      "representative": "minimal formatting",
+      "members": [
+        "minimal formatting",
+        "gives specific recommendations",
+        "prose-heavy",
+        "action-oriented",
+        "monologue-style",
+        "prescriptive",
+        "heavy formatting",
+        "appeals to emotion",
+        "uses code snippets",
+        "stays narrowly on topic",
+        "presents multiple perspectives",
+        "irreverent",
+        "humorous",
+        "sarcastic"
+      ]
+    },
+    {
+      "representative": "terse",
+      "members": [
+        "terse",
+        "concise",
+        "verbose",
+        "simple language",
+        "elaborate",
+        "sophisticated vocabulary",
+        "blunt",
+        "proactive",
+        "persuasive",
+        "collaborative",
+        "step-by-step",
+        "opinionated",
+        "contrarian",
+        "non-judgmental",
+        "self-deprecating"
+      ]
+    },
+    {
+      "representative": "concrete",
+      "members": [
+        "concrete",
+        "depth-oriented",
+        "conversational",
+        "intuition-driven",
+        "teacher-to-student tone",
+        "distinguishes fact from opinion",
+        "granular",
+        "academic",
+        "calming",
+        "interactive",
+        "gentle",
+        "hedged",
+        "analytical",
+        "pompous",
+        "appeals to authority",
+        "example-driven",
+        "jargon-heavy",
+        "asks clarifying questions"
+      ]
+    }
+  ]
+}

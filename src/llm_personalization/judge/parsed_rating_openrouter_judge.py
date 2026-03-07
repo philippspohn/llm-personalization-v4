@@ -5,7 +5,7 @@ from openai import AsyncOpenAI, APIStatusError
 from tqdm.asyncio import tqdm
 
 from .judge import PrincipleJudge
-from .parsed_rating_judge import JUDGE_SYSTEM_PROMPT_TEMPLATE, JUDGE_USER_TEMPLATE
+from .parsed_rating_judge import JUDGE_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT_THINKING, JUDGE_USER_TEMPLATE_PRINCIPLE
 
 
 class ParsedRatingOpenRouterJudge(PrincipleJudge):
@@ -13,11 +13,9 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
         model: str,
         api_key: str | None = None,
         base_url: str = "https://openrouter.ai/api/v1",
-        judge_system_prompt_template: str = JUDGE_SYSTEM_PROMPT_TEMPLATE,
-        judge_user_template: str = JUDGE_USER_TEMPLATE,
         enable_thinking: bool = False,
-        reasoning_max_tokens: int | None = None,
-        max_tokens: int = 4,
+        reasoning_max_tokens: int = 4096,
+        max_tokens: int = 8192,
         temperature: float = 0.0,
         top_p: float = 1.0,
         presence_penalty: float = 0.0,
@@ -30,8 +28,6 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
         self.model = model
         self.api_key = api_key
         self.base_url = base_url
-        self.judge_system_prompt_template = judge_system_prompt_template
-        self.judge_user_template = judge_user_template
         self.enable_thinking = enable_thinking
         self.reasoning_max_tokens = reasoning_max_tokens
         self.max_tokens = max_tokens
@@ -54,53 +50,37 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
         self.client = None
 
     def _parse_score(self, text: str) -> int | None:
-        text = text.strip()
-        if self.enable_thinking:
-            matches = re.findall(r'\b(10|[1-9])\b', text)
-            if matches:
-                return int(matches[-1])
-            return None
-        if not text.isdigit():
-            return None
-        score = int(text)
-        if not (1 <= score <= 10):
-            return None
-        return score
-
-    @staticmethod
-    def _extract_text_from_content(content) -> str:
-        """Handle both plain string and Claude's block-list content format."""
-        if isinstance(content, list):
-            return next((b["text"] for b in content if b.get("type") == "text"), "")
-        return content or ""
+        matches = re.findall(r'\b(10|[1-9])\b', text.strip())
+        if matches:
+            score = int(matches[-1])
+            if 1 <= score <= 10:
+                return score
+        return None
 
     async def _call_one(self, semaphore: asyncio.Semaphore, messages: list[dict], max_api_retries: int = 6) -> str:
         async with semaphore:
             if self.request_delay > 0:
                 await asyncio.sleep(self.request_delay)
-            kwargs = dict(
-                model=self.model,
-                messages=messages,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature,
-                top_p=self.top_p,
-                presence_penalty=self.presence_penalty,
-            )
-            extra_body = {}
-            reasoning_body = {"enabled": self.enable_thinking}
+            extra_body: dict = {}
             if self.top_k is not None:
                 extra_body["top_k"] = self.top_k
             if self.min_p is not None:
                 extra_body["min_p"] = self.min_p
-            if self.enable_thinking and self.reasoning_max_tokens is not None:
-                reasoning_body["max_tokens"] = self.reasoning_max_tokens
-            extra_body["reasoning"] = reasoning_body
-            kwargs["extra_body"] = extra_body
+            if self.enable_thinking:
+                extra_body["reasoning"] = {"max_tokens": self.reasoning_max_tokens}
 
             for attempt in range(max_api_retries + 1):
                 try:
-                    response = await self.client.chat.completions.create(**kwargs)
-                    return self._extract_text_from_content(response.choices[0].message.content)
+                    response = await self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        max_tokens=self.max_tokens,
+                        temperature=self.temperature,
+                        top_p=self.top_p,
+                        presence_penalty=self.presence_penalty,
+                        extra_body=extra_body or None,
+                    )
+                    return response.choices[0].message.content or ""
                 except APIStatusError as e:
                     if attempt == max_api_retries:
                         raise
@@ -155,8 +135,8 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
             message_string = ""
             for message in messages[:-1]:
                 message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
-            system_prompt = self.judge_system_prompt_template
-            user_prompt = self.judge_user_template.format(
+            system_prompt = JUDGE_SYSTEM_PROMPT_THINKING if self.enable_thinking else JUDGE_SYSTEM_PROMPT
+            user_prompt = JUDGE_USER_TEMPLATE_PRINCIPLE.format(
                 conversation=message_string,
                 response=messages[-1]["content"],
                 principle=principle,
