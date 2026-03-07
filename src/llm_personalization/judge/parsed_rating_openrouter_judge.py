@@ -4,11 +4,11 @@ import re
 from openai import AsyncOpenAI, APIStatusError
 from tqdm.asyncio import tqdm
 
-from .judge import PrincipleJudge
-from .parsed_rating_judge import JUDGE_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT_THINKING, JUDGE_USER_TEMPLATE_PRINCIPLE
+from .judge import AttributeJudge
+from .prompt_templates import JUDGE_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT_THINKING, JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE, JUDGE_USER_TEMPLATE_PROMPT_ATTRIBUTE
 
 
-class ParsedRatingOpenRouterJudge(PrincipleJudge):
+class ParsedRatingOpenRouterJudge(AttributeJudge):
     def __init__(self,
         model: str,
         api_key: str | None = None,
@@ -66,6 +66,8 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
                 extra_body["top_k"] = self.top_k
             if self.min_p is not None:
                 extra_body["min_p"] = self.min_p
+            if self.repetition_penalty != 1.0:
+                extra_body["repetition_penalty"] = self.repetition_penalty
             if self.enable_thinking:
                 extra_body["reasoning"] = {"max_tokens": self.reasoning_max_tokens}
 
@@ -124,10 +126,10 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
     def judge_manual(self, all_messages: list[list[dict]]) -> list[int]:
         return asyncio.run(self._judge_manual_async(all_messages))
 
-    def judge_principle(self, conversations: list[list[dict[str, str]]], principles: list[str]) -> list[int]:
+    def judge_response_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[int]:
         all_messages = []
 
-        for messages, principle in zip(conversations, principles):
+        for messages, attribute in zip(conversations, attributes):
             if len(messages) < 2:
                 raise ValueError(f"Conversation has less than 2 messages: {messages}")
             if messages[-1]["role"] != "assistant" or messages[-2]["role"] != "user":
@@ -136,10 +138,10 @@ class ParsedRatingOpenRouterJudge(PrincipleJudge):
             for message in messages[:-1]:
                 message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
             system_prompt = JUDGE_SYSTEM_PROMPT_THINKING if self.enable_thinking else JUDGE_SYSTEM_PROMPT
-            user_prompt = JUDGE_USER_TEMPLATE_PRINCIPLE.format(
+            user_prompt = JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE.format(
                 conversation=message_string,
                 response=messages[-1]["content"],
-                principle=principle,
+                attribute=attribute,
             )
             all_messages.append([
                 {"role": "system", "content": system_prompt},

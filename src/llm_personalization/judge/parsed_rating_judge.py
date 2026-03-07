@@ -1,6 +1,5 @@
 from vllm.outputs import RequestOutput
 from vllm import LLM, SamplingParams
-from vllm.outputs import RequestOutput
 from transformers import AutoTokenizer
 import gc
 import re
@@ -93,7 +92,7 @@ class ParsedRatingJudge(AttributeJudge):
             timeout_local_indices = []
             for local_i, (score_idx, output) in enumerate(zip(pending_indices, outputs)):
                 if output.outputs[0].finish_reason == "stop":
-                    scores[score_idx] = self._parse_score(output)[tuple[int, RequestOutput]]
+                    scores[score_idx] = self._parse_score(output)
                 else:
                     timeout_local_indices.append(local_i)
 
@@ -103,7 +102,7 @@ class ParsedRatingJudge(AttributeJudge):
                     pending_prompts[local_i] + outputs[local_i].outputs[0].text + "</think>\n\nRating: "
                     for local_i in timeout_local_indices
                 ]
-                retry_outputs = self.llm.generate(retry_prompts, sampling_params=SamplingParams(**self.sampling_params, max_tokens=4))
+                retry_outputs = self.llm.generate(retry_prompts, sampling_params=SamplingParams(**{**self.sampling_params, "max_tokens": 4}))
                 for local_i, o in zip(timeout_local_indices, retry_outputs):
                     scores[pending_indices[local_i]] = self._parse_score(o)
 

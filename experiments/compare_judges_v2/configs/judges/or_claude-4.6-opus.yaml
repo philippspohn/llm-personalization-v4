@@ -1,0 +1,6 @@
+_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
+
+model: anthropic/claude-4.6-opus
+
+enable_thinking: false
+max_tokens: 64

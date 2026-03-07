@@ -23,7 +23,7 @@ Please evaluate how well the AI response adheres to the provided attribute.
 </ai_response_to_evaluate>
 <attribute>
 {attribute}
-</principle>
+</attribute>
 
 To what extent does the response satisfy this attribute?
 Your evaluation (1-10):"""

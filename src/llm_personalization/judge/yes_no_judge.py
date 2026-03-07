@@ -1,17 +1,16 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer
 import gc
 import torch
-import torch.nn.functional as F
 from vllm import LLM, SamplingParams
-from .judge import PrincipleJudge
+from .judge import AttributeJudge
 import math
 
 
 NEMOTRON_PRINCIPLE_QUESTION_TEMPLATE = """Evaluate the response to the previous prompt in terms of whether it satisfies this principle: {principle}. Only answer Yes or No."""
 
 
-class YesNoJudge(PrincipleJudge):
-    model: None | AutoModelForCausalLM = None
+class YesNoJudge(AttributeJudge):
+    llm: None | LLM = None
     tokenizer: None | AutoTokenizer = None
     
     yes_token_id: int
@@ -70,11 +69,11 @@ class YesNoJudge(PrincipleJudge):
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
 
-    def judge_principle(self, conversations: list[list[dict[str, str]]], principles: list[str]) -> list[float]:
+    def judge_response_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[float]:
         conversations_with_principle_question = [
-            [*messages, 
-            {"role": "user", "content": self.principle_question_template.format(principle=principle)}]
-            for messages, principle in zip(conversations, principles)
+            [*messages,
+            {"role": "user", "content": self.principle_question_template.format(principle=attribute)}]
+            for messages, attribute in zip(conversations, attributes)
         ]
         formatted_prompts = [
             self.tokenizer.apply_chat_template(

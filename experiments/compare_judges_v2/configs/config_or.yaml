@@ -1,0 +1,17 @@
+defaults:
+  - judges@judge_configs.glm_5: or_glm-5
+  - judges@judge_configs.gpt_5_4: or_gpt-5.4
+  - judges@judge_configs.gemini_flash: or_gemini-3-flash-preview
+  - judges@judge_configs.claude_opus: or_claude-4.6-opus
+  - judges@judge_configs.kimi_k2_5: or_kimi-k2.5
+  - _self_
+
+limit: 48
+
+pairs:
+- ["verbose", "terse"]
+- ["formal", "casual"]
+- ["warm", "cold"]
+- ["serious", "playful"]
+- ["objective", "subjective"]
+- ["structured", "unstructured"]

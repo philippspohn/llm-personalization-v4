@@ -1,10 +1,22 @@
+defaults:
+  # - judges@judge_configs.phi_4: local_phi-4
+  # - judges@judge_configs.phi_4_weighted: local_phi-4-weighted
+  # - judges@judge_configs.gemma_27b: local_gemma-3-27b-it
+  # - judges@judge_configs.qwen3_5_27b: local_qwen3_5_27b
+  # - judges@judge_configs.qwen3_5_27b_weighted: local_qwen3_5_27b-weighted
+  # - judges@judge_configs.glm_4_5_air: local_glm-4.5-air
+  # - judges@judge_configs.minimax_2_5: local_minimax-m2.5
+  # - judges@judge_configs.qwen3_5_122ba10b: local_qwen3_5_122ba10b
+  - judges@judge_configs.glm_4_5_air_960: local_glm-4.5-air
+  - judges@judge_configs.minimax_2_5_960: local_minimax-m2.5
+  - _self_
 
-judges:
+limit: 960
 
-
-
-limit: 50
 pairs:
 - ["verbose", "terse"]
 - ["formal", "casual"]
 - ["warm", "cold"]
+- ["serious", "playful"]
+- ["objective", "subjective"]
+- ["structured", "unstructured"]
