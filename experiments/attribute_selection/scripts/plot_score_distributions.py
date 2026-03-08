@@ -1,6 +1,5 @@
 import hydra
 from omegaconf import DictConfig
-from candidate_principles import candidate_principles
 from hydra.utils import get_original_cwd
 import numpy as np
 from pathlib import Path
@@ -12,7 +11,7 @@ import matplotlib.ticker as ticker
 def main(cfg: DictConfig) -> None:
     npy_path = Path(get_original_cwd()) / cfg.output_path
     scores_matrix = np.load(npy_path)
-    principle_names = list(candidate_principles)
+    principle_names = list(cfg.candidate_attributes)
     n = len(principle_names)
 
     score_min = int(scores_matrix.min())
