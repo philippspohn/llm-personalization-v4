@@ -1,5 +1,0 @@
-_target_: llm_personalization.judge.RatingJudge
-
-model: qwen/qwen3.5-27b
-tensor_parallel_size: 1
-gpu_memory_utilization: 0.80

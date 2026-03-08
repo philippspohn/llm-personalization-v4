@@ -1,8 +1,0 @@
-defaults:
-  - judge: parsed_glm
-  - candidate_attributes: v2
-  - _self_
-
-output_path: data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_10000_v2.npy
-limit: 10000
-

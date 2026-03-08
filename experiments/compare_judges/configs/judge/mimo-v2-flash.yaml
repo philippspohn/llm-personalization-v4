@@ -1,9 +1,0 @@
-_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
-
-model: xiaomi/mimo-v2-flash
-temperature: 0.8
-top_p: 0.95
-
-enable_thinking: true
-reasoning_max_tokens: 2048
-max_tokens: 4096

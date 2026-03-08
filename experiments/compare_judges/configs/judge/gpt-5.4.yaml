@@ -1,7 +1,0 @@
-_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
-
-model: openai/gpt-5.4
-
-enable_thinking: true
-reasoning_max_tokens: 2048
-max_tokens: 4096

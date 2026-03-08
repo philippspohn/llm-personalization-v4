@@ -1,3 +1,0 @@
-defaults:
-  - judge: parsed_rating
-  - _self_

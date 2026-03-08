@@ -1,0 +1,405 @@
+Parallel analysis: k=95%=16  (showing 50 RCs)
+k_95 explains 60.7% of total variance
+
+Top 5 loadings per rotated component:
+
+RC1 (representative: uses tables):
+  Attribute                                      Loading    Mean     Std  Entropy
+  uses tables                                     +0.996    1.04    0.54    0.078
+  uses code snippets                              +0.112    1.38    1.77    0.342
+  heavy formatting                                +0.042    2.07    1.39    1.989
+  no meta-commentary                              -0.035    8.85    2.51    1.480
+  diplomatic                                      -0.031    8.06    1.46    2.094
+
+RC2 (representative: sarcastic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  sarcastic                                       +0.973    1.02    0.26    0.076
+  irreverent                                      +0.256    1.08    0.44    0.374
+  humorous                                        +0.193    1.21    0.65    0.766
+  absurdist                                       +0.094    1.09    0.46    0.410
+  playful                                         +0.081    2.11    1.16    1.863
+
+RC3 (representative: asks clarifying questions):
+  Attribute                                      Loading    Mean     Std  Entropy
+  asks clarifying questions                       +0.968    1.07    0.68    0.147
+  interactive                                     +0.158    2.54    1.54    2.055
+  socratic                                        +0.118    1.28    0.54    0.910
+  acknowledges uncertainty                        +0.097    2.22    2.37    1.835
+  commits to one answer                           -0.091    7.70    3.00    2.261
+
+RC4 (representative: socratic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  socratic                                        -0.965    1.28    0.54    0.910
+  asks clarifying questions                       -0.117    1.07    0.68    0.147
+  interactive                                     -0.095    2.54    1.54    2.055
+  analytical                                      -0.095    4.39    1.89    2.860
+  abstract                                        -0.091    2.57    1.62    2.138
+
+RC5 (representative: conservative):
+  Attribute                                      Loading    Mean     Std  Entropy
+  conservative                                    +0.963    4.35    2.68    2.833
+  academic                                        -0.104    3.66    1.90    2.707
+  provocative                                     -0.099    1.41    0.75    1.195
+  breadth-oriented                                -0.088    6.37    2.09    2.731
+  jargon-heavy                                    +0.084    3.09    1.87    2.656
+
+RC6 (representative: aggressive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  aggressive                                      -0.954    1.13    0.63    0.505
+  gentle                                          +0.320    7.26    1.60    2.448
+  diplomatic                                      +0.263    8.06    1.46    2.094
+  provocative                                     -0.173    1.41    0.75    1.195
+  non-judgmental                                  +0.140    9.15    1.46    1.785
+
+RC7 (representative: speaks in absolutes):
+  Attribute                                      Loading    Mean     Std  Entropy
+  speaks in absolutes                             -0.943    2.49    2.06    2.318
+  breadth-oriented                                +0.161    6.37    2.09    2.731
+  example-driven                                  +0.145    6.31    2.66    3.154
+  hedged                                          +0.130    2.50    2.06    2.348
+  confident                                       -0.126    7.99    1.76    2.307
+
+RC8 (representative: adds safety warnings):
+  Attribute                                      Loading    Mean     Std  Entropy
+  adds safety warnings                            -0.943    1.48    1.40    1.126
+  cautious                                        -0.412    4.21    2.39    2.814
+  reassuring                                      -0.088    5.23    2.04    2.913
+  proactive                                       -0.087    5.22    1.99    2.897
+  prescriptive                                    -0.080    4.80    3.19    3.008
+
+RC9 (representative: risk-tolerant):
+  Attribute                                      Loading    Mean     Std  Entropy
+  risk-tolerant                                   +0.940    2.14    1.29    1.702
+  provocative                                     +0.184    1.41    0.75    1.195
+  diplomatic                                      -0.141    8.06    1.46    2.094
+  speculative                                     +0.131    2.48    2.22    2.194
+  proactive                                       +0.102    5.22    1.99    2.897
+
+RC10 (representative: contrarian):
+  Attribute                                      Loading    Mean     Std  Entropy
+  contrarian                                      -0.935    1.14    0.56    0.579
+  provocative                                     -0.203    1.41    0.75    1.195
+  pushes back                                     -0.202    1.34    1.29    0.731
+  challenges user assumptions                     -0.184    1.83    1.40    1.683
+  opinionated                                     -0.149    2.27    1.68    2.194
+
+RC11 (representative: validating):
+  Attribute                                      Loading    Mean     Std  Entropy
+  validating                                      -0.929    5.73    2.46    3.096
+  deferential                                     -0.219    5.53    2.50    3.065
+  evidence-based                                  -0.172    3.41    2.25    2.742
+  breadth-oriented                                +0.133    6.37    2.09    2.731
+  empathetic                                      -0.126    4.16    2.05    2.791
+
+RC12 (representative: tough-love):
+  Attribute                                      Loading    Mean     Std  Entropy
+  tough-love                                      +0.926    1.51    0.75    1.304
+  reassuring                                      +0.180    5.23    2.04    2.913
+  empathetic                                      +0.167    4.16    2.05    2.791
+  pessimistic                                     +0.141    1.49    1.23    1.257
+  persuasive                                      +0.117    4.44    1.93    2.809
+
+RC13 (representative: assumes no prior knowledge):
+  Attribute                                      Loading    Mean     Std  Entropy
+  assumes no prior knowledge                      -0.924    7.20    1.93    2.728
+  jargon-heavy                                    +0.384    3.09    1.87    2.656
+  uses code snippets                              +0.227    1.38    1.77    0.342
+  simple language                                 -0.219    7.19    1.28    2.287
+  assumes expert knowledge                        +0.129    3.41    1.80    2.547
+
+RC14 (representative: intuition-driven):
+  Attribute                                      Loading    Mean     Std  Entropy
+  intuition-driven                                +0.913    2.90    1.55    2.133
+  jargon-heavy                                    -0.104    3.09    1.87    2.656
+  playful                                         +0.102    2.11    1.16    1.863
+  uses code snippets                              +0.095    1.38    1.77    0.342
+  acknowledges being an AI                        -0.092    1.16    0.95    0.387
+
+RC15 (representative: first-principles):
+  Attribute                                      Loading    Mean     Std  Entropy
+  first-principles                                -0.912    2.20    0.84    1.455
+  analytical                                      -0.277    4.39    1.89    2.860
+  transparent reasoning                           -0.223    2.76    1.57    2.349
+  jargon-heavy                                    -0.183    3.09    1.87    2.656
+  academic                                        -0.175    3.66    1.90    2.707
+
+RC16 (representative: appeals to authority):
+  Attribute                                      Loading    Mean     Std  Entropy
+  appeals to authority                            +0.908    2.23    2.00    2.073
+  evidence-based                                  +0.374    3.41    2.25    2.742
+  persuasive                                      +0.228    4.44    1.93    2.809
+  academic                                        +0.204    3.66    1.90    2.707
+  high-level                                      +0.172    5.25    2.36    2.908
+
+--- below 95% parallel analysis threshold ──────────────────────────────────────────────────────────
+RC17 (representative: interactive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  interactive                                     +0.896    2.54    1.54    2.055
+  uses code snippets                              +0.229    1.38    1.77    0.342
+  collaborative                                   +0.182    4.52    2.45    2.982
+  conversational                                  +0.138    5.17    2.06    2.862
+  asks clarifying questions                       +0.123    1.07    0.68    0.147
+
+RC18 (representative: defers to the user):
+  Attribute                                      Loading    Mean     Std  Entropy
+  defers to the user                              -0.892    6.08    3.42    2.872
+  deferential                                     -0.203    5.53    2.50    3.065
+  service-oriented                                -0.150    7.75    1.84    2.419
+  collaborative                                   -0.149    4.52    2.45    2.982
+  academic                                        +0.141    3.66    1.90    2.707
+
+RC19 (representative: earnest):
+  Attribute                                      Loading    Mean     Std  Entropy
+  earnest                                         -0.875    7.98    1.11    1.846
+  gentle                                          -0.170    7.26    1.60    2.448
+  serious                                         -0.167    8.25    1.57    2.152
+  service-oriented                                -0.159    7.75    1.84    2.419
+  teacher-to-student tone                         -0.150    5.69    2.42    2.952
+
+RC20 (representative: transactional):
+  Attribute                                      Loading    Mean     Std  Entropy
+  transactional                                   +0.873    5.94    3.21    2.891
+  service-oriented                                +0.265    7.75    1.84    2.419
+  pragmatic                                       +0.193    7.35    2.07    2.605
+  concrete                                        +0.124    7.20    1.97    2.709
+  uses code snippets                              +0.114    1.38    1.77    0.342
+
+RC21 (representative: humble):
+  Attribute                                      Loading    Mean     Std  Entropy
+  humble                                          +0.862    5.32    2.34    2.987
+  cautious                                        +0.214    4.21    2.39    2.814
+  diplomatic                                      +0.188    8.06    1.46    2.094
+  gentle                                          +0.166    7.26    1.60    2.448
+  neutral                                         +0.160    7.71    2.57    2.610
+
+RC22 (representative: appeals to emotion):
+  Attribute                                      Loading    Mean     Std  Entropy
+  appeals to emotion                              +0.859    3.40    2.35    2.856
+  emotionally neutral                             -0.853    7.10    2.67    2.889
+  stoic                                           -0.827    5.55    2.83    3.016
+  dry                                             -0.823    6.66    2.44    2.898
+  clinical                                        -0.791    5.56    2.78    3.121
+
+RC23 (representative: self-aware):
+  Attribute                                      Loading    Mean     Std  Entropy
+  self-aware                                      -0.858    1.49    1.54    0.972
+  self-deprecating                                -0.851    1.19    0.85    0.587
+  admits mistakes readily                         -0.788    1.26    1.13    0.609
+  acknowledges being an AI                        -0.783    1.16    0.95    0.387
+  pushes back                                     -0.663    1.34    1.29    0.731
+
+RC24 (representative: tangential):
+  Attribute                                      Loading    Mean     Std  Entropy
+  tangential                                      +0.857    1.43    0.99    1.189
+  stays narrowly on topic                         -0.817    9.37    0.96    1.492
+  pragmatic                                       -0.210    7.35    2.07    2.605
+  exhaustive                                      -0.169    5.49    1.98    2.967
+  professional                                    -0.168    7.98    1.30    2.020
+
+RC25 (representative: permissive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  permissive                                      -0.856    7.42    2.34    2.732
+  service-oriented                                -0.262    7.75    1.84    2.419
+  patient                                         -0.163    6.94    1.81    2.600
+  example-driven                                  -0.154    6.31    2.66    3.154
+  breadth-oriented                                -0.130    6.37    2.09    2.731
+
+RC26 (representative: assumes expert knowledge):
+  Attribute                                      Loading    Mean     Std  Entropy
+  assumes expert knowledge                        +0.849    3.41    1.80    2.547
+  depth-oriented                                  +0.306    4.75    1.64    2.692
+  sophisticated vocabulary                        +0.218    3.83    1.39    2.417
+  authoritative                                   +0.182    5.90    2.03    2.836
+  granular                                        +0.169    5.91    1.84    2.808
+
+RC27 (representative: absurdist):
+  Attribute                                      Loading    Mean     Std  Entropy
+  absurdist                                       +0.843    1.09    0.46    0.410
+  irreverent                                      +0.687    1.08    0.44    0.374
+  humorous                                        +0.512    1.21    0.65    0.766
+  provocative                                     +0.216    1.41    0.75    1.195
+  playful                                         +0.216    2.11    1.16    1.863
+
+RC28 (representative: challenges user assumptions):
+  Attribute                                      Loading    Mean     Std  Entropy
+  challenges user assumptions                     -0.840    1.83    1.40    1.683
+  pushes back                                     -0.340    1.34    1.29    0.731
+  presents multiple perspectives                  -0.219    3.31    2.18    2.689
+  acknowledges uncertainty                        -0.164    2.22    2.37    1.835
+  cautious                                        -0.157    4.21    2.39    2.814
+
+RC29 (representative: prescriptive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  prescriptive                                    -0.836    4.80    3.19    3.008
+  action-oriented                                 -0.828    5.51    2.65    3.135
+  gives specific recommendations                  -0.778    4.78    3.51    2.914
+  step-by-step                                    -0.609    3.69    2.54    2.879
+  proactive                                       -0.556    5.22    1.99    2.897
+
+RC30 (representative: minimal formatting):
+  Attribute                                      Loading    Mean     Std  Entropy
+  minimal formatting                              +0.835    8.41    2.05    2.420
+  heavy formatting                                -0.808    2.07    1.39    1.989
+  step-by-step                                    -0.281    3.69    2.54    2.879
+  uses code snippets                              -0.268    1.38    1.77    0.342
+  prose-heavy                                     +0.176    4.79    2.36    3.003
+
+RC31 (representative: speculative):
+  Attribute                                      Loading    Mean     Std  Entropy
+  speculative                                     -0.830    2.48    2.22    2.194
+  hedged                                          -0.233    2.50    2.06    2.348
+  evidence-based                                  +0.174    3.41    2.25    2.742
+  high-level                                      -0.163    5.25    2.36    2.908
+  absurdist                                       -0.162    1.09    0.46    0.410
+
+RC32 (representative: verbose):
+  Attribute                                      Loading    Mean     Std  Entropy
+  verbose                                         -0.824    6.48    2.10    2.748
+  terse                                           +0.741    3.63    2.18    2.771
+  elaborate                                       -0.734    6.32    1.83    2.620
+  concise                                         +0.678    5.19    2.09    2.967
+  prose-heavy                                     -0.658    4.79    2.36    3.003
+
+RC33 (representative: calming):
+  Attribute                                      Loading    Mean     Std  Entropy
+  calming                                         -0.821    5.18    1.81    2.853
+  gentle                                          -0.445    7.26    1.60    2.448
+  reassuring                                      -0.357    5.23    2.04    2.913
+  patient                                         -0.293    6.94    1.81    2.600
+  empathetic                                      -0.275    4.16    2.05    2.791
+
+RC34 (representative: peer-to-peer tone):
+  Attribute                                      Loading    Mean     Std  Entropy
+  peer-to-peer tone                               -0.818    4.59    2.33    2.907
+  conversational                                  -0.816    5.17    2.06    2.862
+  casual                                          -0.766    4.43    2.03    2.848
+  colloquial                                      -0.743    3.34    1.68    2.477
+  deferential                                     -0.576    5.53    2.50    3.065
+
+RC35 (representative: pessimistic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  pessimistic                                     -0.801    1.49    1.23    1.257
+  optimistic                                      +0.417    5.80    2.42    3.048
+  provocative                                     -0.352    1.41    0.75    1.195
+  reassuring                                      +0.330    5.23    2.04    2.913
+  cheerful                                        +0.281    4.41    2.11    2.935
+
+RC36 (representative: transparent reasoning):
+  Attribute                                      Loading    Mean     Std  Entropy
+  transparent reasoning                           +0.777    2.76    1.57    2.349
+  analytical                                      +0.435    4.39    1.89    2.860
+  evidence-based                                  +0.244    3.41    2.25    2.742
+  persuasive                                      +0.233    4.44    1.93    2.809
+  teacher-to-student tone                         +0.220    5.69    2.42    2.952
+
+RC37 (representative: exhaustive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  exhaustive                                      -0.773    5.49    1.98    2.967
+  breadth-oriented                                -0.481    6.37    2.09    2.731
+  granular                                        -0.392    5.91    1.84    2.808
+  concrete                                        -0.302    7.20    1.97    2.709
+  depth-oriented                                  -0.290    4.75    1.64    2.692
+
+RC38 (representative: presents multiple perspectives):
+  Attribute                                      Loading    Mean     Std  Entropy
+  presents multiple perspectives                  -0.756    3.31    2.18    2.689
+  commits to one answer                           +0.741    7.70    3.00    2.261
+  breadth-oriented                                -0.275    6.37    2.09    2.731
+  example-driven                                  -0.180    6.31    2.66    3.154
+  step-by-step                                    +0.151    3.69    2.54    2.879
+
+RC39 (representative: non-judgmental):
+  Attribute                                      Loading    Mean     Std  Entropy
+  non-judgmental                                  +0.753    9.15    1.46    1.785
+  opinionated                                     -0.645    2.27    1.68    2.194
+  pompous                                         -0.302    1.89    0.99    1.668
+  morally opinionated                             -0.248    1.54    1.39    1.249
+  neutral                                         +0.219    7.71    2.57    2.610
+
+RC40 (representative: morally opinionated):
+  Attribute                                      Loading    Mean     Std  Entropy
+  morally opinionated                             +0.751    1.54    1.39    1.249
+  provocative                                     +0.315    1.41    0.75    1.195
+  abstract                                        +0.287    2.57    1.62    2.138
+  non-judgmental                                  -0.199    9.15    1.46    1.785
+  didactic                                        +0.195    6.95    2.30    2.674
+
+RC41 (representative: collaborative):
+  Attribute                                      Loading    Mean     Std  Entropy
+  collaborative                                   -0.750    4.52    2.45    2.982
+  deferential                                     -0.336    5.53    2.50    3.065
+  no meta-commentary                              +0.314    8.85    2.51    1.480
+  service-oriented                                -0.256    7.75    1.84    2.419
+  proactive                                       -0.239    5.22    1.99    2.897
+
+RC42 (representative: hedged):
+  Attribute                                      Loading    Mean     Std  Entropy
+  hedged                                          +0.729    2.50    2.06    2.348
+  acknowledges uncertainty                        +0.652    2.22    2.37    1.835
+  confident                                       -0.588    7.99    1.76    2.307
+  cautious                                        +0.511    4.21    2.39    2.814
+  speculative                                     +0.232    2.48    2.22    2.194
+
+RC43 (representative: uses code snippets):
+  Attribute                                      Loading    Mean     Std  Entropy
+  uses code snippets                              -0.692    1.38    1.77    0.342
+  distinguishes fact from opinion                 -0.526    4.67    3.06    2.676
+  persuasive                                      +0.283    4.44    1.93    2.809
+  breadth-oriented                                +0.264    6.37    2.09    2.731
+  no meta-commentary                              +0.192    8.85    2.51    1.480
+
+RC44 (representative: example-driven):
+  Attribute                                      Loading    Mean     Std  Entropy
+  example-driven                                  +0.682    6.31    2.66    3.154
+  abstract                                        -0.641    2.57    1.62    2.138
+  concrete                                        +0.622    7.20    1.97    2.709
+  granular                                        +0.457    5.91    1.84    2.808
+  high-level                                      -0.444    5.25    2.36    2.908
+
+RC45 (representative: monologue-style):
+  Attribute                                      Loading    Mean     Std  Entropy
+  monologue-style                                 +0.678    5.88    3.05    2.885
+  persuasive                                      +0.324    4.44    1.93    2.809
+  prose-heavy                                     +0.295    4.79    2.36    3.003
+  opinionated                                     +0.242    2.27    1.68    2.194
+  high-level                                      +0.218    5.25    2.36    2.908
+
+RC46 (representative: pompous):
+  Attribute                                      Loading    Mean     Std  Entropy
+  pompous                                         -0.666    1.89    0.99    1.668
+  simple language                                 +0.578    7.19    1.28    2.287
+  sophisticated vocabulary                        -0.558    3.83    1.39    2.417
+  jargon-heavy                                    -0.293    3.09    1.87    2.656
+  abstract                                        -0.246    2.57    1.62    2.138
+
+RC47 (representative: professional):
+  Attribute                                      Loading    Mean     Std  Entropy
+  professional                                    -0.665    7.98    1.30    2.020
+  formal                                          -0.435    6.79    1.92    2.703
+  diplomatic                                      -0.397    8.06    1.46    2.094
+  authoritative                                   -0.277    5.90    2.03    2.836
+  serious                                         -0.267    8.25    1.57    2.152
+
+RC48 (representative: playful):
+  Attribute                                      Loading    Mean     Std  Entropy
+  playful                                         -0.650    2.11    1.16    1.863
+  humorous                                        -0.617    1.21    0.65    0.766
+  serious                                         +0.529    8.25    1.57    2.152
+  irreverent                                      -0.316    1.08    0.44    0.374
+  cheerful                                        -0.281    4.41    2.11    2.935
+
+RC49 (representative: high-level):
+  Attribute                                      Loading    Mean     Std  Entropy
+  high-level                                      +0.380    5.25    2.36    2.908
+  jargon-heavy                                    +0.310    3.09    1.87    2.656
+  diplomatic                                      -0.233    8.06    1.46    2.094
+  patient                                         -0.217    6.94    1.81    2.600
+  deferential                                     -0.215    5.53    2.50    3.065
+
+RC50 (representative: acknowledges being an AI):
+  Attribute                                      Loading    Mean     Std  Entropy
+  acknowledges being an AI                        -0.279    1.16    0.95    0.387
+  provocative                                     -0.252    1.41    0.75    1.195
+  commits to one answer                           -0.241    7.70    3.00    2.261
+  presents multiple perspectives                  -0.237    3.31    2.18    2.689
+  admits mistakes readily                         +0.205    1.26    1.13    0.609

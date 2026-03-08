@@ -1,8 +1,0 @@
-defaults:
-  - judge: parsed_qwen
-  - candidate_attributes: v2
-  - _self_
-
-output_path: data/principle_selection/scores_matrix_parsed_qwen3.5-35b-a3b_100_v2.npy
-limit: 100
-

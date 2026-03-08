@@ -1,5 +1,0 @@
-_target_: llm_personalization.judge.YesNoJudge
-
-model: nvidia/Llama-3.3-Nemotron-70B-Reward-Principle
-tensor_parallel_size: 2
-gpu_memory_utilization: 0.9

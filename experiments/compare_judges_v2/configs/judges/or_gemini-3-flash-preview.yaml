@@ -1,7 +1,0 @@
-_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
-
-model: google/gemini-3-flash-preview
-
-enable_thinking: true
-reasoning_max_tokens: 2048
-max_tokens: 4096

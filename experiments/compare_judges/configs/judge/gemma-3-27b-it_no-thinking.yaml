@@ -1,8 +1,0 @@
-_target_: llm_personalization.judge.ParsedRatingOpenRouterJudge
-
-model: google/gemma-3-27b-it
-temperature: 1.0
-top_p: 0.95
-
-enable_thinking: false
-max_tokens: 4096

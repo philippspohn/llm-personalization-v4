@@ -1,25 +1,26 @@
-judges:
-  # - glm-4.5-air
-  # - glm-4.7-flash
-  # - gpt-oss-20b
-  # - gpt-oss-120b
-  # - kimi-k2.5 ////
-  # - minimax-m2.5
-  # - qwen3.5-27b
-  # - qwen3.5-35b-a3b
-  # - qwen3.5-122b-a10b
-  # - qwen3.5-397b-a17b
-  # - step-3.5-flash
-  # - phi-4
-  # - gemma-3-27b-it_no-thinking
-  # - phi-4_no-thinking
-  # - qwen3.5-27b_no-thinking
-  # - mimo-v2-flash
-  # - local_step-3.5-flash
-  # - weighted_phi-4
-  # - weighted_gemma-3-27b-it
-  # - weighted_qwen3.5-27b
-  # - gpt-5.4
-  # - gemini-3-flash-preview
-  # - gemini-3.1-pro-preview
-  - claude-4.6-opus
+defaults:
+  - judges@judge_configs.phi_4: local_phi-4
+  - judges@judge_configs.phi_4_weighted: local_phi-4-weighted
+  - judges@judge_configs.gemma_27b: local_gemma-3-27b-it
+  - judges@judge_configs.qwen3_5_27b: local_qwen3_5_27b
+  - judges@judge_configs.qwen3_5_27b_weighted: local_qwen3_5_27b-weighted
+  # - judges@judge_configs.glm_4_5_air: local_glm-4.5-air
+  # - judges@judge_configs.minimax_2_5: local_minimax-m2.5
+  # - judges@judge_configs.qwen3_5_122ba10b: local_qwen3_5_122ba10b
+  # - judges@judge_configs.glm_4_5_air_960: local_glm-4.5-air
+  # - judges@judge_configs.minimax_2_5_960: local_minimax-m2.5
+  # - judges@judge_configs.step_3_5_flash: local_step-3.5-flash
+  # - judges@judge_configs.qwen3_5_35ba3b: local_qwen3_5_35ba3b
+  # - judges@judge_configs.gpt_oss_120b_2: local_gpt-oss-120b
+  - judges@judge_configs.gpt_oss_20b: local_gpt-oss-20b
+  - _self_
+
+limit: 960
+
+pairs:
+- ["verbose", "terse"]
+- ["formal", "casual"]
+- ["warm", "cold"]
+- ["serious", "playful"]
+- ["objective", "subjective"]
+- ["structured", "unstructured"]
