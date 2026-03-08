@@ -1,0 +1,178 @@
+{
+  "method": "umap_hdbscan",
+  "setting": "mcs=3",
+  "k": 16,
+  "groups": [
+    {
+      "representative": "self-aware",
+      "members": [
+        "self-aware",
+        "admits mistakes readily",
+        "self-deprecating",
+        "pushes back",
+        "acknowledges being an AI",
+        "acknowledges uncertainty",
+        "no meta-commentary",
+        "confident",
+        "cautious",
+        "humble",
+        "hedged",
+        "challenges user assumptions",
+        "speculative",
+        "contrarian"
+      ]
+    },
+    {
+      "representative": "jargon-heavy",
+      "members": [
+        "jargon-heavy",
+        "academic",
+        "assumes no prior knowledge",
+        "assumes expert knowledge",
+        "authoritative",
+        "depth-oriented",
+        "elaborate",
+        "monologue-style",
+        "breadth-oriented",
+        "appeals to authority"
+      ]
+    },
+    {
+      "representative": "prescriptive",
+      "members": [
+        "prescriptive",
+        "gives specific recommendations",
+        "action-oriented",
+        "step-by-step",
+        "proactive",
+        "heavy formatting",
+        "minimal formatting",
+        "service-oriented"
+      ]
+    },
+    {
+      "representative": "humorous",
+      "members": [
+        "humorous",
+        "playful",
+        "irreverent",
+        "serious",
+        "absurdist",
+        "formal",
+        "sarcastic"
+      ]
+    },
+    {
+      "representative": "verbose",
+      "members": [
+        "verbose",
+        "terse",
+        "concise",
+        "prose-heavy",
+        "sophisticated vocabulary",
+        "simple language",
+        "pompous"
+      ]
+    },
+    {
+      "representative": "conversational",
+      "members": [
+        "conversational",
+        "peer-to-peer tone",
+        "deferential",
+        "permissive",
+        "collaborative",
+        "interactive",
+        "validating"
+      ]
+    },
+    {
+      "representative": "teacher-to-student tone",
+      "members": [
+        "teacher-to-student tone",
+        "didactic",
+        "patient",
+        "earnest",
+        "speaks in absolutes",
+        "adds safety warnings"
+      ]
+    },
+    {
+      "representative": "granular",
+      "members": [
+        "granular",
+        "exhaustive",
+        "example-driven",
+        "tangential",
+        "stays narrowly on topic"
+      ]
+    },
+    {
+      "representative": "appeals to emotion",
+      "members": [
+        "appeals to emotion",
+        "distinguishes fact from opinion",
+        "opinionated",
+        "non-judgmental",
+        "conservative"
+      ]
+    },
+    {
+      "representative": "warm",
+      "members": [
+        "warm",
+        "empathetic",
+        "enthusiastic",
+        "reassuring"
+      ]
+    },
+    {
+      "representative": "gentle",
+      "members": [
+        "gentle",
+        "calming",
+        "diplomatic"
+      ]
+    },
+    {
+      "representative": "analytical",
+      "members": [
+        "analytical",
+        "transparent reasoning",
+        "first-principles"
+      ]
+    },
+    {
+      "representative": "pragmatic",
+      "members": [
+        "pragmatic",
+        "transactional",
+        "blunt"
+      ]
+    },
+    {
+      "representative": "stoic",
+      "members": [
+        "stoic",
+        "clinical",
+        "emotionally neutral"
+      ]
+    },
+    {
+      "representative": "casual",
+      "members": [
+        "casual",
+        "colloquial",
+        "intuition-driven"
+      ]
+    },
+    {
+      "representative": "provocative",
+      "members": [
+        "provocative",
+        "morally opinionated",
+        "risk-tolerant"
+      ]
+    }
+  ]
+}

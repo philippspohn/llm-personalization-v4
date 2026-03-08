@@ -9,6 +9,10 @@ min_p: 0.0
 presence_penalty: 1.5
 repetition_penalty: 1.0
 
+vllm_kwargs:
+  language_model_only: True
+  enable_prefix_caching: True
+
 enable_thinking: true
 reasoning_max_tokens: 2048
 max_tokens: 4096

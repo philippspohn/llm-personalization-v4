@@ -1,0 +1,199 @@
+{
+  "method": "pca",
+  "setting": "k=16",
+  "k": 16,
+  "groups": [
+    {
+      "representative": "adds safety warnings",
+      "members": [
+        "adds safety warnings",
+        "cautious"
+      ]
+    },
+    {
+      "representative": "self-aware",
+      "members": [
+        "self-aware",
+        "self-deprecating",
+        "admits mistakes readily",
+        "acknowledges being an AI",
+        "pushes back",
+        "no meta-commentary",
+        "acknowledges uncertainty",
+        "confident",
+        "challenges user assumptions",
+        "humble",
+        "hedged"
+      ]
+    },
+    {
+      "representative": "emotionally neutral",
+      "members": [
+        "emotionally neutral",
+        "appeals to emotion",
+        "dry",
+        "stoic",
+        "clinical",
+        "neutral",
+        "indifferent",
+        "empathetic",
+        "authoritative",
+        "optimistic",
+        "enthusiastic",
+        "blunt",
+        "distinguishes fact from opinion",
+        "pragmatic",
+        "serious",
+        "formal",
+        "academic",
+        "professional",
+        "evidence-based",
+        "opinionated",
+        "morally opinionated",
+        "transactional",
+        "transparent reasoning",
+        "non-judgmental",
+        "intuition-driven",
+        "risk-tolerant",
+        "conservative",
+        "aggressive",
+        "uses tables"
+      ]
+    },
+    {
+      "representative": "tangential",
+      "members": [
+        "tangential",
+        "stays narrowly on topic"
+      ]
+    },
+    {
+      "representative": "conversational",
+      "members": [
+        "conversational",
+        "peer-to-peer tone",
+        "casual",
+        "colloquial",
+        "deferential",
+        "warm",
+        "cheerful",
+        "gentle",
+        "teacher-to-student tone",
+        "permissive",
+        "diplomatic",
+        "validating"
+      ]
+    },
+    {
+      "representative": "verbose",
+      "members": [
+        "verbose",
+        "elaborate",
+        "terse",
+        "prose-heavy",
+        "depth-oriented",
+        "concise",
+        "breadth-oriented",
+        "patient",
+        "sophisticated vocabulary",
+        "monologue-style",
+        "analytical",
+        "didactic",
+        "pompous",
+        "first-principles",
+        "speculative"
+      ]
+    },
+    {
+      "representative": "prescriptive",
+      "members": [
+        "prescriptive",
+        "action-oriented",
+        "gives specific recommendations",
+        "step-by-step",
+        "proactive",
+        "persuasive",
+        "heavy formatting",
+        "minimal formatting",
+        "speaks in absolutes"
+      ]
+    },
+    {
+      "representative": "asks clarifying questions",
+      "members": [
+        "asks clarifying questions",
+        "tough-love",
+        "socratic"
+      ]
+    },
+    {
+      "representative": "appeals to authority",
+      "members": [
+        "appeals to authority"
+      ]
+    },
+    {
+      "representative": "humorous",
+      "members": [
+        "humorous",
+        "irreverent",
+        "absurdist",
+        "playful",
+        "earnest",
+        "sarcastic"
+      ]
+    },
+    {
+      "representative": "presents multiple perspectives",
+      "members": [
+        "presents multiple perspectives",
+        "commits to one answer"
+      ]
+    },
+    {
+      "representative": "concrete",
+      "members": [
+        "concrete",
+        "granular",
+        "example-driven",
+        "abstract",
+        "exhaustive",
+        "high-level"
+      ]
+    },
+    {
+      "representative": "pessimistic",
+      "members": [
+        "pessimistic",
+        "provocative",
+        "reassuring",
+        "calming",
+        "contrarian"
+      ]
+    },
+    {
+      "representative": "interactive",
+      "members": [
+        "interactive",
+        "uses code snippets"
+      ]
+    },
+    {
+      "representative": "assumes no prior knowledge",
+      "members": [
+        "assumes no prior knowledge",
+        "assumes expert knowledge",
+        "jargon-heavy",
+        "simple language"
+      ]
+    },
+    {
+      "representative": "defers to the user",
+      "members": [
+        "defers to the user",
+        "collaborative",
+        "service-oriented"
+      ]
+    }
+  ]
+}

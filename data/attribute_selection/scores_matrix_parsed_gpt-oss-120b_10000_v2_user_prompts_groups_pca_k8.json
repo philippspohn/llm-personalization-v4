@@ -1,0 +1,144 @@
+{
+  "method": "pca",
+  "setting": "k=8",
+  "k": 8,
+  "groups": [
+    {
+      "representative": "enthusiastic",
+      "members": [
+        "enthusiastic",
+        "dry",
+        "neutral",
+        "sycophantic",
+        "opinionated",
+        "colloquial",
+        "formal",
+        "playful",
+        "professional",
+        "confessional",
+        "calm",
+        "trusting",
+        "collaborative",
+        "confident",
+        "drops user directly into a task",
+        "self-referential",
+        "validation-seeking"
+      ]
+    },
+    {
+      "representative": "disjointed",
+      "members": [
+        "disjointed",
+        "unpolished",
+        "rambling",
+        "typo-heavy",
+        "shitposting",
+        "articulate",
+        "tangential",
+        "confused",
+        "frantic",
+        "laser-focused",
+        "suspicious",
+        "meticulously edited",
+        "humorous",
+        "heavy formatting",
+        "slang-heavy",
+        "minimal formatting",
+        "low-context",
+        "anthropomorphizing",
+        "outcome-oriented",
+        "bullet-heavy",
+        "boundary-testing"
+      ]
+    },
+    {
+      "representative": "simple language",
+      "members": [
+        "simple language",
+        "rudimentary",
+        "rule-heavy",
+        "conversational",
+        "demanding",
+        "verbose",
+        "terse",
+        "receptive",
+        "sophisticated vocabulary",
+        "commanding",
+        "novice",
+        "assumes shared context",
+        "wall-of-text",
+        "multi-step",
+        "relaxed",
+        "casual",
+        "prescriptive",
+        "polite",
+        "nuanced",
+        "analytical",
+        "creative",
+        "scenario-building"
+      ]
+    },
+    {
+      "representative": "contrarian",
+      "members": [
+        "contrarian",
+        "argumentative",
+        "adversarial",
+        "skeptical",
+        "provocative",
+        "sarcastic",
+        "aggressive",
+        "morally opinionated",
+        "politically charged",
+        "stubborn",
+        "defensive"
+      ]
+    },
+    {
+      "representative": "exploratory",
+      "members": [
+        "exploratory",
+        "open-ended",
+        "open-minded",
+        "flexible",
+        "brainstorming",
+        "patient",
+        "earnest",
+        "hypothetical"
+      ]
+    },
+    {
+      "representative": "anxious",
+      "members": [
+        "anxious",
+        "desperate",
+        "urgent",
+        "frustrated",
+        "troubleshooting",
+        "impatient"
+      ]
+    },
+    {
+      "representative": "tech-savvy",
+      "members": [
+        "tech-savvy",
+        "jargon-heavy",
+        "domain-expert",
+        "guarded",
+        "uses code snippets"
+      ]
+    },
+    {
+      "representative": "vague",
+      "members": [
+        "vague",
+        "precise",
+        "highly constrained",
+        "fact-seeking",
+        "high-context",
+        "single-shot",
+        "transactional"
+      ]
+    }
+  ]
+}

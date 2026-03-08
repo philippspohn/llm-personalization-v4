@@ -1,0 +1,153 @@
+First 5 principles: ['warm', 'clinical', 'enthusiastic', 'calming', 'blunt']
+Parallel analysis suggests k=10 components
+These explain 39.7% of total variance
+
+Rank   Eigenvalue   Representative                           Loading 
+----------------------------------------------------------------------
+1      7.85         appeals to emotion                       -0.787  
+2      4.12         prescriptive                             +0.729  
+3      5.21         conversational                           -0.727  
+4      4.44         acknowledges uncertainty                 -0.722  
+5      7.45         exhaustive                               +0.633  
+6      5.80         elaborate                                -0.625  
+7      2.04         humorous                                 +0.617  
+8      2.81         reassuring                               +0.589  
+9      2.64         uses code snippets                       +0.561  
+10     2.11         abstract                                 -0.449  
+
+======================================================================
+Top 5 loadings per rotated component:
+
+RC1 (representative: appeals to emotion):
+  appeals to emotion                            -0.787
+  emotionally neutral                           +0.782
+  clinical                                      +0.753
+  stoic                                         +0.631
+  indifferent                                   +0.613
+
+RC2 (representative: prescriptive):
+  prescriptive                                  +0.729
+  gives specific recommendations                +0.692
+  action-oriented                               +0.667
+  heavy formatting                              +0.556
+  minimal formatting                            -0.464
+
+RC3 (representative: conversational):
+  conversational                                -0.727
+  interactive                                   -0.703
+  peer-to-peer tone                             -0.650
+  collaborative                                 -0.627
+  colloquial                                    -0.476
+
+RC4 (representative: acknowledges uncertainty):
+  acknowledges uncertainty                      -0.722
+  self-aware                                    -0.639
+  no meta-commentary                            +0.551
+  challenges user assumptions                   -0.545
+  hedged                                        -0.516
+
+RC5 (representative: exhaustive):
+  exhaustive                                    +0.633
+  concrete                                      +0.605
+  granular                                      +0.605
+  authoritative                                 +0.592
+  validating                                    +0.550
+
+RC6 (representative: elaborate):
+  elaborate                                     -0.625
+  verbose                                       -0.608
+  sophisticated vocabulary                      -0.569
+  prose-heavy                                   -0.565
+  terse                                         +0.562
+
+RC7 (representative: humorous):
+  humorous                                      +0.617
+  playful                                       +0.542
+  serious                                       -0.361
+  irreverent                                    +0.357
+  sarcastic                                     +0.333
+
+RC8 (representative: reassuring):
+  reassuring                                    +0.589
+  calming                                       +0.552
+  provocative                                   -0.521
+  optimistic                                    +0.471
+  gentle                                        +0.467
+
+RC9 (representative: uses code snippets):
+  uses code snippets                            +0.561
+  aggressive                                    +0.473
+  jargon-heavy                                  +0.372
+  opinionated                                   +0.354
+  intuition-driven                              +0.335
+
+RC10 (representative: abstract):
+  abstract                                      -0.449
+  opinionated                                   -0.427
+  high-level                                    -0.400
+  example-driven                                +0.374
+  concrete                                      +0.370
+
+Antonym correlations (negative = judge discriminates well):
+  formal / casual: -0.374
+    formal: mean=7.1 std=1.9 range=[1,10]
+    casual: mean=4.3 std=2.3 range=[1,10]
+    sum: mean=11.4 std=2.4 range=[3,20]
+  concise / verbose: -0.347
+    concise: mean=5.8 std=1.9 range=[1,10]
+    verbose: mean=4.9 std=2.5 range=[1,10]
+    sum: mean=10.6 std=2.6 range=[3,18]
+  optimistic / pessimistic: -0.280
+    optimistic: mean=6.2 std=2.5 range=[1,10]
+    pessimistic: mean=3.0 std=2.5 range=[1,10]
+    sum: mean=9.1 std=3.0 range=[2,20]
+  emotionally neutral / appeals to emotion: -0.646
+    emotionally neutral: mean=7.9 std=2.5 range=[1,10]
+    appeals to emotion: mean=2.8 std=2.2 range=[1,10]
+    sum: mean=10.7 std=2.0 range=[3,20]
+
+Top 4 principles:
+   1. appeals to emotion
+   2. prescriptive
+   3. conversational
+   4. acknowledges uncertainty
+
+Top 8 principles:
+   1. appeals to emotion
+   2. prescriptive
+   3. conversational
+   4. acknowledges uncertainty
+   5. exhaustive
+   6. elaborate
+   7. humorous
+   8. reassuring
+
+Top 10 principles:
+   1. appeals to emotion
+   2. prescriptive
+   3. conversational
+   4. acknowledges uncertainty
+   5. exhaustive
+   6. elaborate
+   7. humorous
+   8. reassuring
+   9. uses code snippets
+  10. abstract
+
+Top 10 principles:
+   1. appeals to emotion
+   2. prescriptive
+   3. conversational
+   4. acknowledges uncertainty
+   5. exhaustive
+   6. elaborate
+   7. humorous
+   8. reassuring
+   9. uses code snippets
+  10. abstract
+
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_1000_v2_groups_pca_k4.json
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_1000_v2_groups_pca_k8.json
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_1000_v2_groups_pca_k10.json
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_1000_v2_scree.png
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_glm-4.5-air_reasoning_1000_v2_pca_results.npz

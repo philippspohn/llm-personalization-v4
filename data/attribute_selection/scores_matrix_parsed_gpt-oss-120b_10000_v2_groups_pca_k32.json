@@ -1,0 +1,279 @@
+{
+  "method": "pca",
+  "setting": "k=32",
+  "k": 32,
+  "groups": [
+    {
+      "representative": "uses tables",
+      "members": [
+        "uses tables"
+      ]
+    },
+    {
+      "representative": "conservative",
+      "members": [
+        "conservative"
+      ]
+    },
+    {
+      "representative": "adds safety warnings",
+      "members": [
+        "adds safety warnings",
+        "cautious"
+      ]
+    },
+    {
+      "representative": "self-aware",
+      "members": [
+        "self-aware",
+        "self-deprecating",
+        "admits mistakes readily",
+        "acknowledges being an AI",
+        "pushes back",
+        "no meta-commentary",
+        "confident"
+      ]
+    },
+    {
+      "representative": "emotionally neutral",
+      "members": [
+        "emotionally neutral",
+        "appeals to emotion",
+        "dry",
+        "stoic",
+        "clinical",
+        "neutral",
+        "indifferent",
+        "empathetic",
+        "authoritative",
+        "optimistic",
+        "enthusiastic",
+        "blunt",
+        "distinguishes fact from opinion",
+        "pragmatic",
+        "serious",
+        "formal",
+        "academic",
+        "evidence-based"
+      ]
+    },
+    {
+      "representative": "sarcastic",
+      "members": [
+        "sarcastic"
+      ]
+    },
+    {
+      "representative": "socratic",
+      "members": [
+        "socratic",
+        "tough-love"
+      ]
+    },
+    {
+      "representative": "tangential",
+      "members": [
+        "tangential",
+        "stays narrowly on topic"
+      ]
+    },
+    {
+      "representative": "conversational",
+      "members": [
+        "conversational",
+        "peer-to-peer tone",
+        "casual",
+        "colloquial",
+        "deferential",
+        "warm",
+        "cheerful",
+        "gentle",
+        "teacher-to-student tone",
+        "permissive",
+        "diplomatic"
+      ]
+    },
+    {
+      "representative": "verbose",
+      "members": [
+        "verbose",
+        "elaborate",
+        "terse",
+        "prose-heavy",
+        "depth-oriented",
+        "concise",
+        "breadth-oriented",
+        "patient",
+        "sophisticated vocabulary",
+        "monologue-style",
+        "didactic"
+      ]
+    },
+    {
+      "representative": "prescriptive",
+      "members": [
+        "prescriptive",
+        "action-oriented",
+        "gives specific recommendations",
+        "step-by-step",
+        "proactive",
+        "persuasive"
+      ]
+    },
+    {
+      "representative": "speaks in absolutes",
+      "members": [
+        "speaks in absolutes"
+      ]
+    },
+    {
+      "representative": "minimal formatting",
+      "members": [
+        "minimal formatting",
+        "heavy formatting"
+      ]
+    },
+    {
+      "representative": "contrarian",
+      "members": [
+        "contrarian",
+        "challenges user assumptions"
+      ]
+    },
+    {
+      "representative": "asks clarifying questions",
+      "members": [
+        "asks clarifying questions"
+      ]
+    },
+    {
+      "representative": "aggressive",
+      "members": [
+        "aggressive"
+      ]
+    },
+    {
+      "representative": "appeals to authority",
+      "members": [
+        "appeals to authority"
+      ]
+    },
+    {
+      "representative": "humorous",
+      "members": [
+        "humorous",
+        "irreverent",
+        "absurdist",
+        "playful",
+        "earnest"
+      ]
+    },
+    {
+      "representative": "validating",
+      "members": [
+        "validating"
+      ]
+    },
+    {
+      "representative": "presents multiple perspectives",
+      "members": [
+        "presents multiple perspectives",
+        "commits to one answer"
+      ]
+    },
+    {
+      "representative": "concrete",
+      "members": [
+        "concrete",
+        "granular",
+        "example-driven",
+        "abstract",
+        "exhaustive"
+      ]
+    },
+    {
+      "representative": "first-principles",
+      "members": [
+        "first-principles",
+        "transparent reasoning",
+        "analytical"
+      ]
+    },
+    {
+      "representative": "pessimistic",
+      "members": [
+        "pessimistic",
+        "provocative",
+        "reassuring",
+        "calming"
+      ]
+    },
+    {
+      "representative": "non-judgmental",
+      "members": [
+        "non-judgmental",
+        "opinionated",
+        "pompous"
+      ]
+    },
+    {
+      "representative": "hedged",
+      "members": [
+        "hedged",
+        "speculative",
+        "acknowledges uncertainty"
+      ]
+    },
+    {
+      "representative": "interactive",
+      "members": [
+        "interactive",
+        "uses code snippets"
+      ]
+    },
+    {
+      "representative": "intuition-driven",
+      "members": [
+        "intuition-driven"
+      ]
+    },
+    {
+      "representative": "assumes no prior knowledge",
+      "members": [
+        "assumes no prior knowledge",
+        "assumes expert knowledge",
+        "jargon-heavy",
+        "simple language"
+      ]
+    },
+    {
+      "representative": "defers to the user",
+      "members": [
+        "defers to the user",
+        "collaborative",
+        "service-oriented"
+      ]
+    },
+    {
+      "representative": "risk-tolerant",
+      "members": [
+        "risk-tolerant",
+        "morally opinionated"
+      ]
+    },
+    {
+      "representative": "professional",
+      "members": [
+        "professional",
+        "high-level"
+      ]
+    },
+    {
+      "representative": "transactional",
+      "members": [
+        "transactional",
+        "humble"
+      ]
+    }
+  ]
+}

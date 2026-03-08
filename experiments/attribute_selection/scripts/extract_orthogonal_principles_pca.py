@@ -34,7 +34,7 @@ def main(cfg: DictConfig) -> None:
     npy_path = Path(get_original_cwd()) / cfg.output_path
     scores_matrix = np.load(npy_path)
     num_conversations, num_principles = scores_matrix.shape
-    principle_names = list(cfg.candidate_principles)
+    principle_names = list(cfg.candidate_attributes)
     print(f"First 5 principles: {principle_names[:5]}")
     if len(principle_names) != num_principles:
         raise ValueError(f"Number of principles in config ({len(principle_names)}) does not match number of principles in scores matrix ({num_principles})")

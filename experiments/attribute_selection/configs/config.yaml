@@ -1,7 +1,8 @@
 defaults:
-  - judge: parsed_glm
-  - candidate_principles: v2
+  - judge: local_gpt-oss-120b
+  - candidate_attributes: v2
   - _self_
 
-output_path: data/principle_selection/scores_matrix_parsed_glm-4.5-air_1000_v2.npy
-limit: 1000
+output_path: data/attribute_selection/scores_matrix_parsed_gpt-oss-120b_10000_v2.npy
+limit: 10000
+mode: response_attribute

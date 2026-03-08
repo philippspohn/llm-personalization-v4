@@ -1,6 +1,5 @@
 import hydra
 from omegaconf import DictConfig
-from candidate_principles import candidate_principles
 from hydra.utils import get_original_cwd
 import numpy as np
 from pathlib import Path
@@ -15,7 +14,7 @@ def main(cfg: DictConfig) -> None:
     npy_path = Path(get_original_cwd()) / cfg.output_path
     scores_matrix = np.load(npy_path)
     num_conversations, num_principles = scores_matrix.shape
-    principle_names = np.array(candidate_principles)
+    principle_names = np.array(cfg.candidate_attributes)
 
     # Standardize
     scores_std = (scores_matrix - scores_matrix.mean(axis=0)) / (scores_matrix.std(axis=0) + 1e-8)

@@ -61,5 +61,7 @@ secrets.json
 
 !/data/principle_selection/
 !/data/principle_selection/*
+!/data/attribute_selection/
+!/data/attribute_selection/*
 !/data/compare_judges/
 !/data/compare_judges/*

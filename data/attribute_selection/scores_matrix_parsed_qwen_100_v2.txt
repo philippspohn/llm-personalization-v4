@@ -1,0 +1,111 @@
+First 5 principles: ['warm', 'clinical', 'enthusiastic', 'calming', 'blunt']
+Warning: 4 principle(s) have zero variance: ['humorous', 'sarcastic', 'irreverent', 'uses tables']
+Parallel analysis suggests k=6 components
+These explain 36.4% of total variance
+
+Rank   Eigenvalue   Representative                           Loading 
+----------------------------------------------------------------------
+1      8.04         warm                                     -0.793  
+2      5.18         acknowledges being an AI                 +0.759  
+3      10.83        conservative                             +0.755  
+4      5.15         minimal formatting                       +0.711  
+5      5.54         terse                                    -0.673  
+6      5.98         concrete                                 -0.593  
+
+======================================================================
+Top 5 loadings per rotated component:
+
+RC1 (representative: warm):
+  warm                                          -0.793
+  dry                                           +0.713
+  empathetic                                    -0.708
+  cheerful                                      -0.705
+  emotionally neutral                           +0.631
+
+RC2 (representative: acknowledges being an AI):
+  acknowledges being an AI                      +0.759
+  challenges user assumptions                   +0.704
+  no meta-commentary                            -0.616
+  acknowledges uncertainty                      +0.496
+  pushes back                                   +0.483
+
+RC3 (representative: conservative):
+  conservative                                  +0.755
+  professional                                  +0.743
+  cautious                                      +0.726
+  validating                                    +0.689
+  service-oriented                              +0.684
+
+RC4 (representative: minimal formatting):
+  minimal formatting                            +0.711
+  gives specific recommendations                -0.705
+  prose-heavy                                   +0.637
+  action-oriented                               -0.633
+  monologue-style                               +0.549
+
+RC5 (representative: terse):
+  terse                                         -0.673
+  concise                                       -0.612
+  verbose                                       +0.552
+  simple language                               -0.547
+  elaborate                                     +0.545
+
+RC6 (representative: concrete):
+  concrete                                      -0.593
+  depth-oriented                                -0.592
+  conversational                                -0.576
+  intuition-driven                              -0.496
+  teacher-to-student tone                       -0.492
+
+Antonym correlations (negative = judge discriminates well):
+  formal / casual: -0.323
+    formal: mean=7.6 std=2.3 range=[1,10]
+    casual: mean=4.0 std=2.1 range=[1,10]
+    sum: mean=11.6 std=2.6 range=[4,20]
+  concise / verbose: -0.403
+    concise: mean=6.2 std=2.0 range=[2,10]
+    verbose: mean=4.6 std=2.7 range=[1,10]
+    sum: mean=10.8 std=2.7 range=[5,18]
+  optimistic / pessimistic: -0.230
+    optimistic: mean=7.4 std=2.6 range=[1,10]
+    pessimistic: mean=2.1 std=2.3 range=[1,10]
+    sum: mean=9.5 std=3.1 range=[2,19]
+  emotionally neutral / appeals to emotion: -0.071
+    emotionally neutral: mean=8.1 std=2.9 range=[1,10]
+    appeals to emotion: mean=5.2 std=3.7 range=[1,10]
+    sum: mean=13.3 std=4.5 range=[2,20]
+
+Top 4 principles:
+   1. warm
+   2. acknowledges being an AI
+   3. conservative
+   4. minimal formatting
+
+Top 6 principles:
+   1. warm
+   2. acknowledges being an AI
+   3. conservative
+   4. minimal formatting
+   5. terse
+   6. concrete
+
+Top 6 principles:
+   1. warm
+   2. acknowledges being an AI
+   3. conservative
+   4. minimal formatting
+   5. terse
+   6. concrete
+
+Top 6 principles:
+   1. warm
+   2. acknowledges being an AI
+   3. conservative
+   4. minimal formatting
+   5. terse
+   6. concrete
+
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_qwen3.5-35b-a3b_100_v2_groups_pca_k4.json
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_qwen3.5-35b-a3b_100_v2_groups_pca_k6.json
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_qwen3.5-35b-a3b_100_v2_scree.png
+Saved /data/pspohn/llm-personalization-v4/data/principle_selection/scores_matrix_parsed_qwen3.5-35b-a3b_100_v2_pca_results.npz
