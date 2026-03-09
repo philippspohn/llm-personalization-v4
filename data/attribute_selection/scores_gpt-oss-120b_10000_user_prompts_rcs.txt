@@ -1,0 +1,264 @@
+Parallel analysis: ceiling k_95=10
+k_95 explains 63.2% of total variance
+Entropy filter (>= 1.5): keeping 67/97 attributes
+Removed: ['frustrated', 'desperate', 'aggressive', 'disjointed', 'tangential', 'confused', 'adversarial', 'anthropomorphizing', 'skeptical', 'urgent', 'frantic', 'self-referential', 'slang-heavy', 'typo-heavy', 'argumentative', 'stubborn', 'contrarian', 'suspicious', 'defensive', 'humorous', 'sarcastic', 'shitposting', 'heavy formatting', 'minimal formatting', 'uses code snippets', 'bullet-heavy', 'morally opinionated', 'politically charged', 'provocative', 'boundary-testing']
+
+================================================================================
+=== VARIMAX ROTATION WITH k=2 ===
+================================================================================
+
+RC1 (SSL: 14.396, representative: conversational):
+  Attribute                                      Loading    Mean     Std  Entropy
+  conversational                                  -0.868    6.75    2.72    2.606
+  receptive                                       -0.847    7.32    2.86    2.396
+  simple language                                 -0.847    7.13    2.24    2.683
+  verbose                                         +0.795    3.71    2.45    2.649
+  wall-of-text                                    +0.778    2.33    2.42    1.880
+
+RC2 (SSL: 9.991, representative: neutral):
+  Attribute                                      Loading    Mean     Std  Entropy
+  neutral                                         +0.781    7.62    2.97    2.622
+  dry                                             +0.774    5.66    2.88    3.065
+  formal                                          +0.771    5.70    2.43    2.928
+  professional                                    +0.771    7.30    2.10    2.565
+  enthusiastic                                    -0.749    4.36    2.39    2.804
+
+================================================================================
+=== VARIMAX ROTATION WITH k=4 ===
+================================================================================
+
+RC1 (SSL: 11.066, representative: verbose):
+  Attribute                                      Loading    Mean     Std  Entropy
+  verbose                                         +0.844    3.71    2.45    2.649
+  simple language                                 -0.836    7.13    2.24    2.683
+  rudimentary                                     -0.805    6.17    2.64    2.715
+  terse                                           -0.781    5.22    2.77    3.080
+  sophisticated vocabulary                        +0.780    3.10    1.52    2.234
+
+RC2 (SSL: 9.864, representative: professional):
+  Attribute                                      Loading    Mean     Std  Entropy
+  professional                                    +0.795    7.30    2.10    2.565
+  formal                                          +0.783    5.70    2.43    2.928
+  neutral                                         +0.767    7.62    2.97    2.622
+  dry                                             +0.765    5.66    2.88    3.065
+  enthusiastic                                    -0.715    4.36    2.39    2.804
+
+RC3 (SSL: 7.670, representative: open-minded):
+  Attribute                                      Loading    Mean     Std  Entropy
+  open-minded                                     +0.728    6.24    2.26    2.719
+  patient                                         +0.681    5.14    2.40    2.895
+  exploratory                                     +0.670    6.53    2.48    2.837
+  polite                                          +0.656    8.12    1.80    2.415
+  trusting                                        +0.643    4.40    2.53    2.858
+
+RC4 (SSL: 3.730, representative: unpolished):
+  Attribute                                      Loading    Mean     Std  Entropy
+  unpolished                                      +0.506    2.34    1.77    2.011
+  fact-seeking                                    +0.500    7.17    3.58    2.447
+  rambling                                        +0.477    2.00    1.88    1.795
+  jargon-heavy                                    +0.470    2.27    1.75    2.225
+  prescriptive                                    -0.468    4.56    3.34    2.814
+
+================================================================================
+=== VARIMAX ROTATION WITH k=6 ===
+================================================================================
+
+RC1 (SSL: 10.097, representative: verbose):
+  Attribute                                      Loading    Mean     Std  Entropy
+  verbose                                         +0.862    3.71    2.45    2.649
+  wall-of-text                                    +0.837    2.33    2.42    1.880
+  simple language                                 -0.821    7.13    2.24    2.683
+  sophisticated vocabulary                        +0.772    3.10    1.52    2.234
+  terse                                           -0.756    5.22    2.77    3.080
+
+RC2 (SSL: 9.523, representative: enthusiastic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  enthusiastic                                    -0.881    4.36    2.39    2.804
+  colloquial                                      -0.769    4.46    2.42    2.923
+  dry                                             +0.768    5.66    2.88    3.065
+  sycophantic                                     -0.748    1.88    1.46    1.826
+  neutral                                         +0.742    7.62    2.97    2.622
+
+RC3 (SSL: 5.848, representative: fact-seeking):
+  Attribute                                      Loading    Mean     Std  Entropy
+  fact-seeking                                    +0.694    7.17    3.58    2.447
+  prescriptive                                    -0.684    4.56    3.34    2.814
+  commanding                                      -0.647    2.71    1.96    1.988
+  demanding                                       -0.577    3.29    2.15    2.394
+  polite                                          +0.555    8.12    1.80    2.415
+
+RC4 (SSL: 5.104, representative: articulate):
+  Attribute                                      Loading    Mean     Std  Entropy
+  articulate                                      +0.661    8.24    1.10    1.717
+  precise                                         +0.623    6.73    2.20    2.626
+  professional                                    +0.604    7.30    2.10    2.565
+  vague                                           -0.600    2.10    1.47    1.653
+  unpolished                                      -0.560    2.34    1.77    2.011
+
+RC5 (SSL: 3.818, representative: open-ended):
+  Attribute                                      Loading    Mean     Std  Entropy
+  open-ended                                      +0.752    7.11    2.58    2.784
+  exploratory                                     +0.704    6.53    2.48    2.837
+  open-minded                                     +0.645    6.24    2.26    2.719
+  flexible                                        +0.516    4.77    2.52    2.754
+  nuanced                                         +0.478    3.25    1.74    2.271
+
+RC6 (SSL: 2.246, representative: anxious):
+  Attribute                                      Loading    Mean     Std  Entropy
+  anxious                                         +0.693    1.64    1.05    1.540
+  troubleshooting                                 +0.626    2.03    1.77    1.894
+  guarded                                         +0.478    1.95    1.26    1.739
+  impatient                                       +0.417    1.86    0.95    1.590
+  validation-seeking                              +0.396    2.22    1.65    2.009
+
+================================================================================
+=== VARIMAX ROTATION WITH k=8 ===
+================================================================================
+
+RC1 (SSL: 10.842, representative: verbose):
+  Attribute                                      Loading    Mean     Std  Entropy
+  verbose                                         +0.864    3.71    2.45    2.649
+  simple language                                 -0.850    7.13    2.24    2.683
+  wall-of-text                                    +0.822    2.33    2.42    1.880
+  sophisticated vocabulary                        +0.799    3.10    1.52    2.234
+  terse                                           -0.776    5.22    2.77    3.080
+
+RC2 (SSL: 8.931, representative: enthusiastic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  enthusiastic                                    -0.880    4.36    2.39    2.804
+  dry                                             +0.791    5.66    2.88    3.065
+  neutral                                         +0.781    7.62    2.97    2.622
+  sycophantic                                     -0.750    1.88    1.46    1.826
+  colloquial                                      -0.736    4.46    2.42    2.923
+
+RC3 (SSL: 4.990, representative: prescriptive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  prescriptive                                    +0.717    4.56    3.34    2.814
+  fact-seeking                                    -0.672    7.17    3.58    2.447
+  commanding                                      +0.631    2.71    1.96    1.988
+  polite                                          -0.568    8.12    1.80    2.415
+  receptive                                       -0.520    7.32    2.86    2.396
+
+RC4 (SSL: 4.729, representative: articulate):
+  Attribute                                      Loading    Mean     Std  Entropy
+  articulate                                      -0.748    8.24    1.10    1.717
+  unpolished                                      +0.724    2.34    1.77    2.011
+  meticulously edited                             -0.615    5.62    2.19    2.847
+  rambling                                        +0.570    2.00    1.88    1.795
+  earnest                                         -0.545    7.63    1.64    2.130
+
+RC5 (SSL: 3.693, representative: open-ended):
+  Attribute                                      Loading    Mean     Std  Entropy
+  open-ended                                      +0.714    7.11    2.58    2.784
+  brainstorming                                   +0.660    3.37    2.44    2.593
+  flexible                                        +0.657    4.77    2.52    2.754
+  exploratory                                     +0.640    6.53    2.48    2.837
+  open-minded                                     +0.637    6.24    2.26    2.719
+
+RC6 (SSL: 2.475, representative: tech-savvy):
+  Attribute                                      Loading    Mean     Std  Entropy
+  tech-savvy                                      -0.588    2.82    2.29    2.456
+  creative                                        +0.469    2.92    1.62    2.098
+  outcome-oriented                                -0.414    6.33    2.32    2.947
+  scenario-building                               +0.397    3.81    2.62    2.713
+  calm                                            -0.383    7.30    2.08    2.322
+
+RC7 (SSL: 2.119, representative: transactional):
+  Attribute                                      Loading    Mean     Std  Entropy
+  transactional                                   +0.500    6.18    3.26    2.852
+  vague                                           -0.449    2.10    1.47    1.653
+  precise                                         +0.426    6.73    2.20    2.626
+  highly constrained                              +0.425    5.44    2.41    3.077
+  high-context                                    +0.403    4.40    2.69    2.730
+
+RC8 (SSL: 2.115, representative: anxious):
+  Attribute                                      Loading    Mean     Std  Entropy
+  anxious                                         +0.757    1.64    1.05    1.540
+  troubleshooting                                 +0.567    2.03    1.77    1.894
+  guarded                                         +0.459    1.95    1.26    1.739
+  validation-seeking                              +0.421    2.22    1.65    2.009
+  impatient                                       +0.398    1.86    0.95    1.590
+
+================================================================================
+=== VARIMAX ROTATION WITH k=10 ===
+================================================================================
+
+RC1 (SSL: 10.486, representative: verbose):
+  Attribute                                      Loading    Mean     Std  Entropy
+  verbose                                         +0.877    3.71    2.45    2.649
+  simple language                                 -0.850    7.13    2.24    2.683
+  wall-of-text                                    +0.840    2.33    2.42    1.880
+  sophisticated vocabulary                        +0.794    3.10    1.52    2.234
+  terse                                           -0.794    5.22    2.77    3.080
+
+RC2 (SSL: 8.898, representative: enthusiastic):
+  Attribute                                      Loading    Mean     Std  Entropy
+  enthusiastic                                    -0.863    4.36    2.39    2.804
+  dry                                             +0.797    5.66    2.88    3.065
+  neutral                                         +0.787    7.62    2.97    2.622
+  colloquial                                      -0.749    4.46    2.42    2.923
+  formal                                          +0.746    5.70    2.43    2.928
+
+RC3 (SSL: 4.979, representative: prescriptive):
+  Attribute                                      Loading    Mean     Std  Entropy
+  prescriptive                                    -0.725    4.56    3.34    2.814
+  commanding                                      -0.642    2.71    1.96    1.988
+  polite                                          +0.586    8.12    1.80    2.415
+  fact-seeking                                    +0.574    7.17    3.58    2.447
+  rule-heavy                                      -0.543    2.23    2.11    1.963
+
+RC4 (SSL: 4.111, representative: unpolished):
+  Attribute                                      Loading    Mean     Std  Entropy
+  unpolished                                      -0.728    2.34    1.77    2.011
+  articulate                                      +0.712    8.24    1.10    1.717
+  meticulously edited                             +0.621    5.62    2.19    2.847
+  rambling                                        -0.579    2.00    1.88    1.795
+  earnest                                         +0.497    7.63    1.64    2.130
+
+RC5 (SSL: 3.527, representative: open-ended):
+  Attribute                                      Loading    Mean     Std  Entropy
+  open-ended                                      +0.705    7.11    2.58    2.784
+  brainstorming                                   +0.664    3.37    2.44    2.593
+  flexible                                        +0.643    4.77    2.52    2.754
+  open-minded                                     +0.632    6.24    2.26    2.719
+  exploratory                                     +0.631    6.53    2.48    2.837
+
+RC6 (SSL: 2.462, representative: transactional):
+  Attribute                                      Loading    Mean     Std  Entropy
+  transactional                                   +0.638    6.18    3.26    2.852
+  collaborative                                   +0.598    4.69    2.88    2.903
+  trusting                                        +0.496    4.40    2.53    2.858
+  patient                                         +0.450    5.14    2.40    2.895
+  sycophantic                                     +0.380    1.88    1.46    1.826
+
+RC7 (SSL: 2.094, representative: anxious):
+  Attribute                                      Loading    Mean     Std  Entropy
+  anxious                                         +0.755    1.64    1.05    1.540
+  troubleshooting                                 +0.602    2.03    1.77    1.894
+  guarded                                         +0.446    1.95    1.26    1.739
+  validation-seeking                              +0.407    2.22    1.65    2.009
+  confessional                                    +0.399    1.83    1.58    1.715
+
+RC8 (SSL: 1.957, representative: highly constrained):
+  Attribute                                      Loading    Mean     Std  Entropy
+  highly constrained                              +0.559    5.44    2.41    3.077
+  vague                                           -0.552    2.10    1.47    1.653
+  precise                                         +0.513    6.73    2.20    2.626
+  high-context                                    +0.347    4.40    2.69    2.730
+  fact-seeking                                    +0.299    7.17    3.58    2.447
+
+RC9 (SSL: 1.951, representative: tech-savvy):
+  Attribute                                      Loading    Mean     Std  Entropy
+  tech-savvy                                      +0.763    2.82    2.29    2.456
+  jargon-heavy                                    +0.480    2.27    1.75    2.225
+  domain-expert                                   +0.474    3.82    2.18    2.685
+  analytical                                      +0.319    3.54    2.18    2.532
+  guarded                                         +0.281    1.95    1.26    1.739
+
+RC10 (SSL: 1.891, representative: hypothetical):
+  Attribute                                      Loading    Mean     Std  Entropy
+  hypothetical                                    +0.647    2.61    2.71    2.068
+  scenario-building                               +0.566    3.81    2.62    2.713
+  creative                                        +0.388    2.92    1.62    2.098
+  fact-seeking                                    -0.335    7.17    3.58    2.447
+  calm                                            -0.324    7.30    2.08    2.322

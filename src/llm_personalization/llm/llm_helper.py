@@ -21,12 +21,14 @@ class LLMHelper:
         model: str,
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.80,
+        max_model_len: int | None = None,
         enable_thinking: bool = False,
         sampling_params: dict[str, Any] | None = None,
     ):
         self.model = model
         self.tensor_parallel_size = tensor_parallel_size
         self.gpu_memory_utilization = gpu_memory_utilization
+        self.max_model_len = max_model_len
         self.enable_thinking = enable_thinking
         self.sampling_params = sampling_params or {}
         
@@ -35,6 +37,7 @@ class LLMHelper:
             model=self.model,
             tensor_parallel_size=self.tensor_parallel_size,
             gpu_memory_utilization=self.gpu_memory_utilization,
+            max_model_len=self.max_model_len,
             trust_remote_code=True,
         )
         
@@ -79,15 +82,20 @@ class LLMHelper:
         for output in outputs:
             raw_text = output.outputs[0].text
             if self.enable_thinking:
+                assistant_final_sep = "assistantfinal"
                 think_start = raw_text.find("<think>")
                 think_end = raw_text.find("</think>")
-                if think_start != -1 and think_end != -1:
+                af_pos = raw_text.find(assistant_final_sep)
+                if af_pos != -1:
+                    reasoning = raw_text[8:af_pos].strip()  # skip leading "analysis"
+                    content = raw_text[af_pos + len(assistant_final_sep):].strip()
+                elif think_start != -1 and think_end != -1:
                     reasoning = raw_text[think_start + len("<think>"):think_end].strip()
                     content = raw_text[think_end + len("</think>"):].strip()
                 else:
                     reasoning = None
                     content = raw_text
-                    print(f"[LLMHelper] Warning: No <think> tag found in output: {raw_text!r}")
+                    print(f"[LLMHelper] Warning: No <think> tag or assistantfinal found in output: {raw_text!r}")
             else:
                 reasoning = None
                 content = raw_text

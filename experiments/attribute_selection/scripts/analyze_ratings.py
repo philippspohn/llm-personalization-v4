@@ -6,12 +6,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import umap
+import yaml
 
 
-def varimax(loadings, max_iter=100, tol=1e-6):
+def varimax(loadings, max_iter=500, tol=1e-6):
     n, k = loadings.shape
     rotation = np.eye(k)
-    for _ in range(max_iter):
+    for iteration in range(max_iter):
         old = rotation.copy()
         for i in range(k):
             for j in range(i + 1, k):
@@ -26,6 +27,8 @@ def varimax(loadings, max_iter=100, tol=1e-6):
                 rotation[:, [i, j]] = rotation[:, [i, j]] @ rot
         if np.max(np.abs(rotation - old)) < tol:
             break
+    if iteration == max_iter - 1:
+        print(f"Warning: Varimax failed to converge within {max_iter} iterations.")
     return loadings @ rotation
 
 
@@ -40,19 +43,19 @@ def compute_entropy(col):
 def main(cfg: DictConfig) -> None:
     npy_path = Path(get_original_cwd()) / cfg.output_path
     scores_matrix = np.load(npy_path)
-    num_conversations, num_principles = scores_matrix.shape
-    principle_names = list(cfg.candidate_attributes)
+    num_conversations, num_attributes = scores_matrix.shape
+    attribute_names = list(cfg.candidate_attributes)
 
-    if len(principle_names) != num_principles:
+    if len(attribute_names) != num_attributes:
         raise ValueError(
-            f"Number of principles in config ({len(principle_names)}) does not match "
-            f"number of principles in scores matrix ({num_principles})"
+            f"Number of attributes in config ({len(attribute_names)}) does not match "
+            f"number of attributes in scores matrix ({num_attributes})"
         )
 
     # Handle NaN
     if np.isnan(scores_matrix).any():
         col_mean = np.nanmean(scores_matrix, axis=0)
-        for j in range(num_principles):
+        for j in range(num_attributes):
             mask = np.isnan(scores_matrix[:, j])
             if mask.any():
                 scores_matrix[mask, j] = col_mean[j]
@@ -61,7 +64,7 @@ def main(cfg: DictConfig) -> None:
     # Per-attribute stats
     col_means = np.nanmean(scores_matrix, axis=0)
     col_stds = np.nanstd(scores_matrix, axis=0)
-    col_entropies = np.array([compute_entropy(scores_matrix[:, j]) for j in range(num_principles)])
+    col_entropies = np.array([compute_entropy(scores_matrix[:, j]) for j in range(num_attributes)])
 
     # Standardize
     col_std_safe = np.where(col_stds > 1e-10, col_stds, 1.0)
@@ -69,8 +72,8 @@ def main(cfg: DictConfig) -> None:
 
     zero_var = col_stds <= 1e-10
     if zero_var.any():
-        zero_names = [principle_names[i] for i in np.where(zero_var)[0]]
-        print(f"Warning: {zero_var.sum()} zero-variance principle(s): {zero_names[:5]}")
+        zero_names = [attribute_names[i] for i in np.where(zero_var)[0]]
+        print(f"Warning: {zero_var.sum()} zero-variance attribute(s): {zero_names[:5]}")
         np.random.seed(42)
         scores_std[:, zero_var] = np.random.randn(num_conversations, zero_var.sum())
 
@@ -80,7 +83,7 @@ def main(cfg: DictConfig) -> None:
     if np.isnan(corr_matrix).any() or np.isinf(corr_matrix).any():
         raise ValueError("Correlation matrix contains NaN/Inf.")
 
-    name_to_idx = {name: i for i, name in enumerate(principle_names)}
+    name_to_idx = {name: i for i, name in enumerate(attribute_names)}
 
     # =========================================================================
     # 1. Antonym sanity check
@@ -113,11 +116,11 @@ def main(cfg: DictConfig) -> None:
     bins = np.arange(score_min, score_max + 2) - 0.5
 
     ncols = 20
-    nrows = (num_principles + ncols - 1) // ncols
+    nrows = (num_attributes + ncols - 1) // ncols
     fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 1.6, nrows * 1.4))
     axes = axes.flatten()
 
-    for i, name in enumerate(principle_names):
+    for i, name in enumerate(attribute_names):
         ax = axes[i]
         counts, _ = np.histogram(scores_matrix[:, i], bins=bins)
         ax.bar(np.arange(score_min, score_max + 1), counts, width=0.8, color='steelblue', linewidth=0)
@@ -127,15 +130,41 @@ def main(cfg: DictConfig) -> None:
         ax.tick_params(axis='both', labelsize=3.5, length=2, pad=1)
         ax.spines[['top', 'right']].set_visible(False)
 
-    for j in range(num_principles, len(axes)):
+    for j in range(num_attributes, len(axes)):
         axes[j].set_visible(False)
 
-    fig.suptitle('Score distributions per principle', fontsize=12, y=1.002)
+    fig.suptitle('Score distributions per attribute', fontsize=12, y=1.002)
     plt.tight_layout(h_pad=1.2, w_pad=0.5)
     dist_path = npy_path.with_name(npy_path.stem + '_score_distributions.png')
     plt.savefig(dist_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f"Saved {dist_path}")
+
+    # =========================================================================
+    # 2.5 Pre-filter: remove low-entropy attributes
+    # =========================================================================
+    entropy_threshold = cfg.entropy_threshold
+    keep_mask = col_entropies >= entropy_threshold
+    removed = [attribute_names[i] for i in range(num_attributes) if not keep_mask[i]]
+    print(f"Entropy filter (>= {entropy_threshold}): keeping {keep_mask.sum()}/{num_attributes} attributes")
+    if removed:
+        print(f"  Removed: {removed}")
+    print()
+
+    scores_std = scores_std[:, keep_mask]
+    col_means = col_means[keep_mask]
+    col_stds = col_stds[keep_mask]
+    col_entropies = col_entropies[keep_mask]
+    attribute_names = [attribute_names[i] for i in range(num_attributes) if keep_mask[i]]
+    num_attributes_before_filtering = num_attributes
+    num_attributes = keep_mask.sum()
+    name_to_idx = {name: i for i, name in enumerate(attribute_names)}
+
+    # Recompute correlation matrix on filtered set
+    corr_matrix = (scores_std.T @ scores_std) / (num_conversations - 1)
+    np.fill_diagonal(corr_matrix, 1.0)
+    if np.isnan(corr_matrix).any() or np.isinf(corr_matrix).any():
+        raise ValueError("Correlation matrix contains NaN/Inf after filtering.")
 
     # =========================================================================
     # 3. PCA + Varimax
@@ -145,58 +174,69 @@ def main(cfg: DictConfig) -> None:
     eigenvectors = eigenvectors[:, ::-1]
 
     # Parallel analysis — compute threshold at 95%
-    n_show_rcs = min(50, num_principles)
     n_iterations = 100
-    random_eigenvalues = np.zeros((n_iterations, num_principles))
+    random_eigenvalues = np.zeros((n_iterations, num_attributes))
     for i in range(n_iterations):
-        random_data = np.random.normal(size=(num_conversations, num_principles))
+        random_data = np.random.normal(size=(num_conversations, num_attributes))
         random_corr = np.corrcoef(random_data, rowvar=False)
         random_eigenvalues[i] = np.sort(np.linalg.eigh(random_corr)[0])[::-1]
     threshold_95 = np.percentile(random_eigenvalues, 95, axis=0)
     k_95 = max(1, int(np.sum(eigenvalues > threshold_95)))
 
-    loadings = eigenvectors[:, :n_show_rcs] * np.sqrt(eigenvalues[:n_show_rcs])
-    rotated_loadings = varimax(loadings)
-
-    selected = []
-    for comp_idx in range(n_show_rcs):
-        best_idx = np.argmax(np.abs(rotated_loadings[:, comp_idx]))
-        top5 = sorted(
-            [(principle_names[i], rotated_loadings[i, comp_idx]) for i in range(num_principles)],
-            key=lambda x: abs(x[1]), reverse=True
-        )[:5]
-        selected.append({
-            'component': comp_idx + 1,
-            'eigenvalue': float(np.sum(rotated_loadings[:, comp_idx] ** 2)),
-            'attribute': principle_names[best_idx],
-            'loading': float(rotated_loadings[best_idx, comp_idx]),
-            'top5': top5,
-        })
-
-    selected.sort(key=lambda s: abs(s['loading']), reverse=True)
-    for i, s in enumerate(selected):
-        s['rank'] = i + 1
+    # Determine k targets (2, 4, 6, 8... up to k_95)
+    k_targets = list(range(2, k_95 + 1, 2))
+    if k_95 not in k_targets:
+        k_targets.append(k_95)
 
     cumulative_var = np.cumsum(eigenvalues) / eigenvalues.sum()
 
     lines = []
-    lines.append(f"Parallel analysis: k=95%={k_95}  (showing {n_show_rcs} RCs)")
+    lines.append(f"Parallel analysis: ceiling k_95={k_95}")
     lines.append(f"k_95 explains {cumulative_var[k_95-1]:.1%} of total variance")
+    lines.append(f"Entropy filter (>= {entropy_threshold}): keeping {keep_mask.sum()}/{num_attributes_before_filtering} attributes")
+    lines.append(f"Removed: {removed}")
     lines.append("")
-    lines.append("Top 5 loadings per rotated component:")
-    lines.append("")
+
     row_fmt = "  {:<45} {:>+8.3f}  {:>6.2f}  {:>6.2f}  {:>7.3f}"
     hdr = f"  {'Attribute':<45} {'Loading':>8}  {'Mean':>6}  {'Std':>6}  {'Entropy':>7}"
-    for s in selected:
-        rank = s['rank']
-        if rank == k_95 + 1:
-            lines.append(f"{'--- below 95% parallel analysis threshold ':─<100}")
-        lines.append(f"RC{rank} (representative: {s['attribute']}):")
-        lines.append(hdr)
-        for name, loading in s['top5']:
-            idx = name_to_idx[name]
-            lines.append(row_fmt.format(name, loading, col_means[idx], col_stds[idx], col_entropies[idx]))
+
+    for k in k_targets:
+        lines.append(f"{'='*80}")
+        lines.append(f"=== VARIMAX ROTATION WITH k={k} ===")
+        lines.append(f"{'='*80}")
         lines.append("")
+
+        # 1. Slice up to k, then apply varimax
+        loadings = eigenvectors[:, :k] * np.sqrt(eigenvalues[:k])
+        rotated_loadings = varimax(loadings)
+
+        # 2. Extract and sort components by their new Sum of Squared Loadings (SSL)
+        selected = []
+        for comp_idx in range(k):
+            ssl = float(np.sum(rotated_loadings[:, comp_idx] ** 2))
+            best_idx = np.argmax(np.abs(rotated_loadings[:, comp_idx]))
+            top5 = sorted(
+                [(attribute_names[i], rotated_loadings[i, comp_idx]) for i in range(num_attributes)],
+                key=lambda x: abs(x[1]), reverse=True
+            )[:5]
+            selected.append({
+                'component': comp_idx + 1,
+                'ssl': ssl,
+                'attribute': attribute_names[best_idx],
+                'top5': top5,
+            })
+
+        selected.sort(key=lambda s: s['ssl'], reverse=True)
+
+        # 3. Format output
+        for i, s in enumerate(selected):
+            rank = i + 1
+            lines.append(f"RC{rank} (SSL: {s['ssl']:.3f}, representative: {s['attribute']}):")
+            lines.append(hdr)
+            for name, loading in s['top5']:
+                idx = name_to_idx[name]
+                lines.append(row_fmt.format(name, loading, col_means[idx], col_stds[idx], col_entropies[idx]))
+            lines.append("")
 
     output = "\n".join(lines)
     print(output)
@@ -205,8 +245,29 @@ def main(cfg: DictConfig) -> None:
     txt_path.write_text(output)
     print(f"Saved {txt_path}")
 
+    # =========================================================================
+    # 3b. Write per-k attribute YAML files
+    # =========================================================================
+    mode = cfg.get("mode", "response_attribute")
+    subdir = "user_prompt_attributes" if mode == "prompt_attribute" else "response_attributes"
+    yaml_dir = npy_path.parent / subdir
+    yaml_dir.mkdir(parents=True, exist_ok=True)
+
+    for k in k_targets:
+        loadings = eigenvectors[:, :k] * np.sqrt(eigenvalues[:k])
+        rotated_loadings = varimax(loadings)
+        # One representative attribute per component (highest absolute loading)
+        attrs = []
+        for comp_idx in range(k):
+            best_idx = int(np.argmax(np.abs(rotated_loadings[:, comp_idx])))
+            attrs.append(attribute_names[best_idx])
+        yaml_path = yaml_dir / f"{subdir}_k{k}.yaml"
+        with open(yaml_path, "w") as f:
+            yaml.dump({"candidate_attributes": attrs}, f, default_flow_style=False, allow_unicode=True)
+        print(f"Saved {yaml_path}")
+
     # Scree plot
-    n_show_scree = min(60, num_principles)
+    n_show_scree = min(60, num_attributes)
     plt.figure(figsize=(10, 5))
     plt.plot(range(1, n_show_scree + 1), eigenvalues[:n_show_scree], 'bo-', label='Data')
     plt.plot(range(1, n_show_scree + 1), threshold_95[:n_show_scree], 'r--', label='95th percentile (random)')
@@ -232,9 +293,9 @@ def main(cfg: DictConfig) -> None:
 
     fig, ax = plt.subplots(figsize=(20, 16))
     ax.scatter(embedding[:, 0], embedding[:, 1], s=20, alpha=0.6)
-    for i, name in enumerate(principle_names):
+    for i, name in enumerate(attribute_names):
         ax.annotate(name, (embedding[i, 0], embedding[i, 1]), fontsize=10, alpha=0.8)
-    ax.set_title('UMAP of principles (distance = 1 - |correlation|)')
+    ax.set_title('UMAP of attributes (distance = 1 - |correlation|)')
     ax.axis('off')
     plt.tight_layout()
     umap_path = npy_path.with_name(npy_path.stem + '_umap.png')

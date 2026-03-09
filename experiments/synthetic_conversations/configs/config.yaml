@@ -1,6 +1,11 @@
 defaults:
-  - llm: glm-4.5-air-thinking
+  - llm: gpt-oss-120b
+  - attributes: user_prompt_attributes_k10
   - _self_
 
-
-limit: 1000
+num_train_users: 3
+num_test_users: 1
+num_conversations_per_user: 4 # 40
+num_attributes_per_user: 2 # 2
+train_output_path: data/synthetic_conversations/gpt-oss-120b_k10_2attrs_test_train.jsonl
+test_output_path: data/synthetic_conversations/gpt-oss-120b_k10_2attrs_test_test.jsonl

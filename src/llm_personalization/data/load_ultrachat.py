@@ -69,3 +69,28 @@ def load_ultrachat_conversations(
         random.Random(seed).shuffle(conversations)
 
     return conversations[:limit] if limit else conversations
+
+
+def load_ultrachat_conversations_with_ids(
+    split: Literal["train_sft", "test_sft"],
+    prefixes: tuple[str, ...] | None = None,
+    limit: int | None = None,
+    seed: int | None = None,
+) -> list[tuple[int, list[dict[str, str]]]]:
+    ds = load_dataset("HuggingFaceH4/ultrachat_200k", split=split)
+
+    conversations_with_ids = []
+    for row in ds:
+        if prefixes is not None and not row["prompt_id"].startswith(prefixes):
+            continue
+        messages = row["messages"]
+        if len(messages) < 2:
+            continue
+        if messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
+            continue
+        conversations_with_ids.append((row["prompt_id"], messages))
+
+    if seed is not None:
+        random.Random(seed).shuffle(conversations_with_ids)
+
+    return conversations_with_ids[:limit] if limit else conversations_with_ids
