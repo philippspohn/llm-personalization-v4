@@ -7,13 +7,15 @@ from llm_personalization.data.load_ultrachat import load_ultrachat_conversations
 from pathlib import Path
 import random
 import json
+from tqdm import tqdm
 
 SYSTEM_PROMPT = """
 Your task: Rewrite the highlighted user prompt to match a described persona. Output only the rewritten prompt, nothing else.
 
 Rules:
 - Preserve the core meaning, intent, and information content of the original prompt.
-- Change the way it is expressed — word choice, sentence structure, tone, and register — to match the target style. Apply the style naturally — the rewrite should still sound like a real person, not a caricature.
+- Only rewrite and output the "prompt_to_rewrite" message, the preceding conversation is just for context.
+- Change the way it is expressed — word choice, sentence structure, tone, and register — to match the target style. Apply the style NATURALLY — the rewrite should still sound like a real person, not a caricature. Less is more!
 - Do not mention any style attribute explicitly in the rewritten prompt.
 - Keep roughly the same length unless the style naturally calls for shorter or longer phrasing (e.g., a terse style should be shorter, a verbose style should be longer).
 """
@@ -82,7 +84,8 @@ def main(cfg: DictConfig) -> None:
     for split in ["train", "test"]:
         conversations_with_ids = train_conversations_with_ids if split == "train" else test_conversations_with_ids
         num_sampled_users = num_sampled_train_users if split == "train" else num_sampled_test_users
-        for usr_idx in range(num_sampled_users):
+        print(f"[{split}] Generating {num_sampled_users} users")
+        for usr_idx in tqdm(range(num_sampled_users), desc=f"[{split}] Generating users"):
             sampled_attrs = rng.sample(attributes, num_attributes_per_user)
             rewrite_style_attributes = [
                 {"attribute": attr, "side": rng.choice(["follow", "avoid"])}
@@ -98,19 +101,19 @@ def main(cfg: DictConfig) -> None:
                 conversation_id, conversation = conversations_with_ids[global_conv_idx % len(conversations_with_ids)]
                 global_conv_idx += 1
 
-                # Each user turn (odd indices) gets a rewrite request
+                # Each user turn (even indices: 0, 2, 4, ...) gets a rewrite request
                 request_indices = []  # (request_idx, turn_index_in_conversation)
-                for i in range(1, len(conversation), 2):
-                    current_message_list = conversation[:i]
+                for i in range(0, len(conversation), 2):
+                    preceding_context = conversation[:i]
                     request_idx = len(generation_requests)
                     generation_requests.append([
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {
                             "role": "user",
                             "content": USER_PROMPT_TEMPLATE.format(
-                                conversation=_format_conversation(current_message_list[:-1]),
-                                prompt_to_rewrite=current_message_list[-1]["content"],
-                                rewrite_style=_format_rewrite_style(rewrite_style_attributes),
+                                conversation=_format_conversation(preceding_context),
+                                prompt_to_rewrite=conversation[i]["content"],
+                                formatted_attributes=_format_rewrite_style(rewrite_style_attributes),
                             ),
                         },
                     ])
@@ -118,12 +121,14 @@ def main(cfg: DictConfig) -> None:
                 user["conversations"].append((conversation_id, conversation, request_indices))
             users.append(user)
 
+    print(f"Generating {len(generation_requests)} requests...", flush=True)
     model_responses = llm.generate(generation_requests)
+    print(f"Generated {len(model_responses)} responses", flush=True)
 
     # Validate responses, reconstruct conversations, and group by user
     output_users = {"train": [], "test": []}
     num_discarded = {"train": 0, "test": 0}
-    for user in users:
+    for user in tqdm(users, desc="Validating responses"):
         split = user["split"]
 
         # Check that all generation requests for this user succeeded
@@ -159,7 +164,7 @@ def main(cfg: DictConfig) -> None:
         })
 
     # Trim to the requested number of users and save
-    for split, num_target, path_key in [("train", num_train_users, "train_output_path"), ("test", num_test_users, "test_output_path")]:
+    for split, num_target, path_key in tqdm([("train", num_train_users, "train_output_path"), ("test", num_test_users, "test_output_path")], desc="Saving users"):
         split_users = output_users[split][:num_target]
         print(f"[{split}] Kept {len(split_users)}/{num_target} users, "
               f"discarded {num_discarded[split]} due to failed generations")

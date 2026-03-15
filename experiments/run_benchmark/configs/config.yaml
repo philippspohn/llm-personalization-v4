@@ -1,0 +1,88 @@
+personalization_system:
+  _target_: llm_personalization.personalization_system.attribute_personalization.attribute_personalization_system.AttributePersonalizationSystem
+  text_classification_model_config:
+    num_classes: 10  # should match len(response_attributes)
+    pooling: mean
+    base_model: microsoft/deberta-v3-base
+    max_length: 4096
+  text_classification_model_train_kwargs:
+    batch_size: 8
+    # grad_accum_steps: 8
+    epochs: 1
+    lr: 2e-5
+  llm_helper_config:
+    model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8 # TODO: adjust
+    tensor_parallel_size: 2
+    max_model_len: 32768
+    gpu_memory_utilization: 0.90
+    sampling_params:
+      max_tokens: 2048
+  attributes:  # response attributes the personalization system explores
+    - verbose
+    - formal
+    - warm
+    - serious
+    - objective
+    - structured
+
+unpersonalized_llm_helper:
+  _target_: llm_personalization.llm.llm_helper.LLMHelper
+  model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
+  tensor_parallel_size: 2
+  max_model_len: 32768
+  gpu_memory_utilization: 0.90
+  sampling_params:
+    max_tokens: 2048
+
+attribute_personalization_dataset:
+  _target_: llm_personalization.benchmark.attribute_benchmark.attribute_personalization_dataset.AttributePersonalizationLabeledDataset
+  dataset_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_hf
+  train_limit: 1000
+  test_limit: 100
+  history_max_len: 2
+
+
+attribute_judge:
+  _target_: llm_personalization.judge.ParsedRatingJudge
+  model: openai/gpt-oss-120b
+  tensor_parallel_size: 2
+  max_model_len: 32768
+  gpu_memory_utilization: 0.90
+  enable_thinking: true
+  sampling_params:
+    max_tokens: 4096
+    temperature: 1.0
+    top_p: 0.95
+
+output_dir: data/run_benchmark/{timestamp}
+
+num_worlds: 1
+world_matrix_type: permutation
+
+user_attributes:
+- verbose
+- enthusiastic
+- open-ended
+- tech-savvy
+- highly constrained
+- anxious
+- transactional
+- hypothetical
+- unpolished
+- prescriptive
+
+num_attributes_per_user: 1
+
+response_attributes:
+- emotionally neutral
+- casual
+- elaborate
+- acknowledges uncertainty
+- prescriptive
+- assumes no prior knowledge
+- gentle
+- persuasive
+- presents multiple perspectives
+- collaborative
+
+num_response_attributes_per_user: 1

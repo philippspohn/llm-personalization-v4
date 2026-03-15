@@ -1,10 +1,12 @@
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+import os
 import gc
 import torch
 from typing import Any
 from dataclasses import dataclass
-
 
 @dataclass
 class ModelResponse:
@@ -56,25 +58,33 @@ class LLMHelper:
         self.tokenizer = None
         
         gc.collect()
-        
+
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
-        
-        print("[LLMHelper] Model unloaded")
+            for i in range(torch.cuda.device_count()):
+                free, total = torch.cuda.mem_get_info(i)
+                print(f"[LLMHelper] GPU {i}: {free/1024**3:.1f}/{total/1024**3:.1f} GiB free after unload")
 
+        print("[LLMHelper] Model unloaded")
 
     def generate(self, conversations: list[list[dict[str, str]]]) -> list[ModelResponse]:
         
-        inputs = []
-        for messages in conversations:
-            tokenized_messages = self.tokenizer.apply_chat_template(
+        def _tokenize(messages):
+            result = self.tokenizer.apply_chat_template(
                 messages,
-                tokenize=False,
+                tokenize=True,
                 add_generation_prompt=True,
                 enable_thinking=self.enable_thinking,
             )
-            inputs.append(tokenized_messages)
+            return result["input_ids"] if hasattr(result, "input_ids") else result
+        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+            all_token_ids = list(tqdm(
+                executor.map(_tokenize, conversations),
+                total=len(conversations),
+                desc="Tokenizing",
+            ))
+        inputs = [{"prompt_token_ids": ids} for ids in all_token_ids]
 
         outputs = self.llm.generate(inputs, sampling_params=SamplingParams(**self.sampling_params))
 
@@ -106,6 +116,5 @@ class LLMHelper:
                 raw_text=raw_text,
                 finish_reason_stop=output.outputs[0].finish_reason == "stop",
             ))
-
 
         return model_responses

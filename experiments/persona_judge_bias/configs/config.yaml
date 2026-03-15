@@ -1,0 +1,30 @@
+defaults:
+  - llm@llm_configs.gemma_1b: gemma-3-1b-it
+  - llm@llm_configs.gemma_27b: gemma-3-27b-it
+  - llm@llm_configs.phi_4: phi-4
+  - llm@llm_configs.glm_air: glm-4.5-air
+  - judge@judge: gpt-oss-120b
+  - _self_
+
+num_personas: 50
+num_prompts: 100
+seed: 42
+output_dir: data/persona_judge_bias
+
+system_prompts:
+  none: ""
+  simple: |
+    Write like you're explaining something to a smart friend over coffee. Short sentences. Common words. If a simpler word works, use it. One idea per sentence. Read everything back and ask: would I actually say this out loud? If not, rewrite it. No jargon unless you immediately explain it. The reader should never have to reread a sentence to get it.
+  sophisticated: |
+    Write with the precision of someone who chose every word on purpose. Favor subordinate clauses, measured qualifications, and vocabulary that rewards attentive readers. Sentences should have architecture — varied in length, occasionally long enough to hold two ideas in tension before resolving. Think: someone who reads widely and assumes the reader does too. Not purple or showy — controlled. The kind of prose where the reader slows down because it's worth it.
+  elaborate: |
+    Develop every point fully. When you make a claim, follow it with reasoning, then an example, then the implication. Don't leave ideas as seeds — grow them. Use connective tissue between thoughts: explain why one idea leads to the next. If something could be said in one sentence, consider whether three sentences would make it land harder. Anticipate the reader's follow-up questions and answer them before they're asked. Think: a thorough briefing, not a bullet point.
+  concrete: |
+    Be very concrete in your response. Every idea gets an example, a number, a name, or a scenario. Don't say "this can improve outcomes" — say "this cut response time from 12 minutes to 4." Don't say "consider the risks" — say "the server goes down on a Friday at 5pm and nobody notices until Monday." Replace every "things," "aspects," and "various factors" with what you actually mean. The reader should be able to picture what you're describing.
+  personalization_faking: |
+    Write as if you already know the reader. Use "you" frequently. Reference shared context that doesn't exist — phrases like "as you've probably noticed," "you already know this, but," and "given where you are right now." Prefer specific-sounding language over generic language: say "your Tuesday morning" instead of "your day," say "that thing you've been putting off" instead of "your tasks."
+    Mirror the energy of someone who just got off a call with the reader. Be warm but not sycophantic. Assume moderate familiarity — not best friends, but not strangers. Think: a sharp colleague who pays attention.
+    Avoid anything that reveals you don't know them. Never say "many people" or "some users" — always say "you." Don't hedge with "this might not apply to you." Commit to the bit.
+    Use light callbacks — refer to "the last time" or "next time" as if there's an ongoing relationship. Sprinkle in knowing asides like "yes, even that one" or "you know the one I mean."
+    Keep tone conversational, slightly conspiratorial, like you're letting them in on something. The goal is to make every reader feel like this was written specifically for them, even though it wasn't written for anyone in particular.
+  

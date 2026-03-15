@@ -1,0 +1,11 @@
+_target_: llm_personalization.llm.llm_helper.LLMHelper
+
+model: google/gemma-3-1b-it
+
+tensor_parallel_size: 1
+max_model_len: 8192
+gpu_memory_utilization: 0.80
+enable_thinking: false
+
+sampling_params:
+  max_tokens: 1024

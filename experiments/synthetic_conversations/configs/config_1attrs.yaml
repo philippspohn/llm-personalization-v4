@@ -1,0 +1,11 @@
+defaults:
+  - llm: gpt-oss-120b
+  - attributes: user_prompt_attributes_k10
+  - _self_
+
+num_train_users: 16000
+num_test_users: 1000
+num_conversations_per_user: 20
+num_attributes_per_user: 1
+train_output_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_train.jsonl
+test_output_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_test.jsonl

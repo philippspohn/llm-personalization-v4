@@ -23,6 +23,7 @@ JUDGE_DISPLAY_NAMES = {
     "qwen3_5_35ba3b":         "Qwen3.5 35B A3B",
     "qwen3_5_122ba10b_bf":    "Qwen3.5 122B A10B",
     "step_3_5_flash":         "Step 3.5 Flash",
+    "nemotron_3_super":       "Nemotron 3 Super",
 }
 
 def display_name(judge_key: str) -> str:

@@ -34,6 +34,13 @@ minimax_2_5,serious/playful,160,10.1938,1.8891,1.2438,-0.4065,0.0
 minimax_2_5,objective/subjective,160,10.3188,3.167,2.4062,-0.3218,0.0
 minimax_2_5,structured/unstructured,160,10.625,2.7174,2.025,-0.5079,0.0
 minimax_2_5,overall,960,9.5479,2.6453,2.3062,,
+nemotron_3_super,verbose/terse,160,7.5625,1.9896,3.4875,-0.519,0.0
+nemotron_3_super,formal/casual,160,10.5062,1.9812,1.4812,-0.5912,0.0
+nemotron_3_super,warm/cold,160,9.6188,2.4132,2.1688,-0.6108,0.0
+nemotron_3_super,serious/playful,160,10.0188,1.8624,1.2812,-0.5215,0.0
+nemotron_3_super,objective/subjective,160,11.1875,2.6697,1.7125,-0.5955,0.0
+nemotron_3_super,structured/unstructured,160,11.3625,2.3914,1.7625,-0.6701,0.0
+nemotron_3_super,overall,960,10.0427,2.5697,1.9823,,
 phi_4,verbose/terse,160,11.15,2.7731,2.1,-0.2829,0.0003
 phi_4,formal/casual,160,9.1125,3.2035,2.8125,-0.2073,0.0085
 phi_4,warm/cold,160,4.8125,2.9648,6.3375,0.0064,0.9356
