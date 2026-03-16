@@ -117,4 +117,10 @@ class LLMHelper:
                 finish_reason_stop=output.outputs[0].finish_reason == "stop",
             ))
 
+        for i in range(min(3, len(model_responses))):
+            print(f"[LLMHelper] Output {i}: {model_responses[i].content}")
+            print(f"[LLMHelper] Reasoning {i}: {model_responses[i].reasoning}")
+            print(f"[LLMHelper] Finish reason stop {i}: {model_responses[i].finish_reason_stop}")
+            print("=" * 100)
+
         return model_responses

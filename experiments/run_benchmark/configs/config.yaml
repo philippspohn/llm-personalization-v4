@@ -1,13 +1,12 @@
 personalization_system:
   _target_: llm_personalization.personalization_system.attribute_personalization.attribute_personalization_system.AttributePersonalizationSystem
   text_classification_model_config:
-    num_classes: 10  # should match len(response_attributes)
     pooling: mean
     base_model: microsoft/deberta-v3-base
-    max_length: 4096
+    max_length: 2048
   text_classification_model_train_kwargs:
-    batch_size: 8
-    # grad_accum_steps: 8
+    batch_size: 4
+    grad_accum_steps: 2
     epochs: 1
     lr: 2e-5
   llm_helper_config:
@@ -19,12 +18,27 @@ personalization_system:
       max_tokens: 2048
   attributes:  # response attributes the personalization system explores
     - verbose
-    - formal
-    - warm
-    - serious
-    - objective
-    - structured
+    - enthusiastic
+    - open-ended
+    - tech-savvy
+    - highly constrained
+    - anxious
+    - transactional
+    - hypothetical
+    - unpolished
+    - prescriptive
+  predict_batch_size: 32
 
+    # - emotionally neutral
+    # - casual
+    # - elaborate
+    # - acknowledges uncertainty
+    # - prescriptive
+    # - assumes no prior knowledge
+    # - gentle
+    # - persuasive
+    # - presents multiple perspectives
+    # - collaborative
 unpersonalized_llm_helper:
   _target_: llm_personalization.llm.llm_helper.LLMHelper
   model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8

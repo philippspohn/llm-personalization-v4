@@ -1,0 +1,16 @@
+defaults:
+  - attributes
+  - _self_
+
+num_prompts: 100
+
+generator:
+  _target_: llm_personalization.llm.llm_helper.LLMHelper
+  model: openai/gpt-oss-120b
+  tensor_parallel_size: 2
+  max_model_len: 32768
+  gpu_memory_utilization: 0.90
+  sampling_params:
+    max_tokens: 4096
+
+output_path: data/judge_prompt_selection/responses_gpt-oss-120b_100_k10.csv

@@ -8,6 +8,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Literal
 import torch
+import matplotlib.pyplot as plt
+import numpy as np
 import random
 from llm_personalization.utils.gpu_monitor import log_gpu_usage
 from llm_personalization.llm.llm_helper import LLMHelper
@@ -57,6 +59,18 @@ def _response_attribute_vector_to_attributes(response_attribute_vector: torch.Te
         for i in selected_indices[:max_attributes]:
             attributes.append({"attribute": available_response_attributes[i], "side": "follow" if response_attribute_vector[i] > 0 else "avoid"})
     return attributes
+
+def _plot_score_distribution(scores: torch.Tensor, unpersonalized_scores: torch.Tensor, output_dir: Path, world_idx: int):
+    plt.figure(figsize=(10, 5))
+    bins = np.arange(-10, 11, 1)
+    plt.hist(scores.detach().cpu().numpy(), bins=bins, alpha=0.5, label="Personalized")
+    plt.hist(unpersonalized_scores.detach().cpu().numpy(), bins=bins, alpha=0.5, label="Unpersonalized")
+    plt.xlabel("Score")
+    plt.ylabel("Frequency")
+    plt.title(f"Score Distribution (World {world_idx})")
+    plt.legend()
+    plt.savefig(output_dir / f"score_distribution_world_{world_idx}.png")
+    plt.close()
 
 def run_benchmark(
     benchmark_config: DictConfig,
@@ -134,7 +148,8 @@ def run_benchmark(
 
         print(f"[Benchmark]    Generating unpersoanlized responses...")
         unpersonalized_llm_helper.load()
-        unpersonalized_responses = unpersonalized_llm_helper.generate(test_conversations)
+        unpersonalized_input = [test_dataset[i].current_messages for i in range(len(test_dataset))]
+        unpersonalized_responses = unpersonalized_llm_helper.generate(unpersonalized_input)
         print(f"[Benchmark]    Unpersonalized responses generated. Avg length: {sum(len(response.content) for response in unpersonalized_responses) / len(unpersonalized_responses):.2f}")
         unpersonalized_llm_helper.unload()
         log_gpu_usage("After unpersonalized responses generation")
@@ -171,6 +186,9 @@ def run_benchmark(
         print(f"    - Unpersonalized system score: {unpersonalized_scores.mean():.4f} ± {unpersonalized_scores.std():.4f}")
         print(f"    - Win rate: {win_rate:.4f}")
         print(f"    - Tie rate: {tie_rate:.4f}")
+        print(f"    - Loss rate: {1 - win_rate - tie_rate:.4f}")
+
+        _plot_score_distribution(scores, unpersonalized_scores, output_dir_results, world_idx)
     # Persona Personalization Benchmark
 
     # TODO

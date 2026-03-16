@@ -21,21 +21,22 @@ from llm_personalization.utils.gpu_monitor import log_gpu_usage
 SYSTEM_PROMPT_TEMPLATE = """
 Adopt the following communication style attribute in your responses
 
-{attribute}
+Attribute: {attribute}
 
 Let this attribute naturally shape your tone, word choice, and structure.
 """
 
 
 class AttributePersonalizationSystem(PersonalizationSystem):
-    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "margin"] = "abs", text_classification_model_train_kwargs: dict = {}):
+    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "margin"] = "abs", text_classification_model_train_kwargs: dict = {}, predict_batch_size: int | None = None):
         self.text_classification_model_config = text_classification_model_config
         self.llm_helper_config = llm_helper_config
-        self.text_classification_model = TextClassificationModel(**self.text_classification_model_config)
+        self.text_classification_model = TextClassificationModel(**self.text_classification_model_config, num_classes=len(attributes)*2) # 2 classes per attribute (avoid/follow)
         self.llm_helper = LLMHelper(**self.llm_helper_config)
         self.attributes = attributes
         self.attribute_selection = attribute_selection
         self.text_classification_model_train_kwargs = text_classification_model_train_kwargs
+        self.predict_batch_size = predict_batch_size
         if attribute_selection == "margin":
             print(f"[AttributePersonalizationSystem] Attribute selection set to: margin. Attribute list must be antonym pairs. E.g. {self.attributes[0]} - {self.attributes[1]}")
 
@@ -104,24 +105,49 @@ class AttributePersonalizationSystem(PersonalizationSystem):
 
         # 1.c. Select labels
         print("[AttributePersonalizationSystem] 1.c. Selecting labels...")
-        user_id_to_scores = {}
-        if self.attribute_selection == "abs":
-            for judge_user_id, score in zip(judge_user_ids, raw_judge_scores):
-                if judge_user_id not in user_id_to_scores:
-                    user_id_to_scores[judge_user_id] = []
-                user_id_to_scores[judge_user_id].append(score)
-        elif self.attribute_selection == "margin":
-            # TODO: margin mode needs rework — current pairing logic assumes exactly 2 attributes
-            # and breaks when users have more. Revisit the score pairing strategy.
-            raise NotImplementedError("Margin attribute selection is not yet fully implemented")
-            for i in range(0, len(judge_user_ids), 2):
-                user_id = judge_user_ids[i]
-                score_positive = raw_judge_scores[i]
-                score_negative = raw_judge_scores[i + 1]
-                score_margin = score_positive - score_negative
-                if user_id not in user_id_to_scores:
-                    user_id_to_scores[user_id] = []
-                user_id_to_scores[user_id].append(score_margin)
+        label_idx = 0
+        labels_by_user_id = {}
+        for i, item in enumerate(dataset):
+            user_scores = []
+            for attribute in self.attributes:
+                score = raw_judge_scores[label_idx]
+                label_idx += 1
+                user_scores.append(score)
+            argmax_score = torch.argmax(torch.tensor(user_scores).abs()).item()
+            side = "avoid" if user_scores[argmax_score] < 0 else "follow"
+            label = argmax_score
+            if side == "follow":
+                label = label + len(self.attributes)
+            labels_by_user_id[item.user_id] = label
+            if i < 3:
+                avg_msg_length = sum(len(msg) for msg in item.conversation_history) / len(item.conversation_history)
+                print(f"User {item.user_id} history: {len(item.conversation_history)} messages, avg length: {avg_msg_length}")
+                print(f"User {item.user_id} current messages: {item.current_messages}")
+                print(f"Available attributes: {self.attributes}")
+                print(f"User {item.user_id} scores: {user_scores}") # TODO: should be zero-centered?
+                print(f"User {item.user_id} label: {argmax_score}")
+                print(f"User {item.user_id} label: {self.attributes[label % len(self.attributes)]}")
+                print(f"User {item.user_id} side: {['avoid', 'follow'][label // len(self.attributes)]}")
+                assert side == ['avoid', 'follow'][label // len(self.attributes)]
+
+        # user_id_to_scores = {}
+        # if self.attribute_selection == "abs":
+        #     for judge_user_id, score in zip(judge_user_ids, raw_judge_scores):
+        #         if judge_user_id not in user_id_to_scores:
+        #             user_id_to_scores[judge_user_id] = []
+        #         user_id_to_scores[judge_user_id].append(score)
+        # elif self.attribute_selection == "margin":
+        #     # TODO: margin mode needs rework — current pairing logic assumes exactly 2 attributes
+        #     # and breaks when users have more. Revisit the score pairing strategy.
+        #     raise NotImplementedError("Margin attribute selection is not yet fully implemented")
+        #     for i in range(0, len(judge_user_ids), 2):
+        #         user_id = judge_user_ids[i]
+        #         score_positive = raw_judge_scores[i]
+        #         score_negative = raw_judge_scores[i + 1]
+        #         score_margin = score_positive - score_negative
+        #         if user_id not in user_id_to_scores:
+        #             user_id_to_scores[user_id] = []
+        #         user_id_to_scores[user_id].append(score_margin)
 
         # 2. Train text classification model
         print("[AttributePersonalizationSystem] 2.   Training text classification model...")
@@ -130,7 +156,7 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         labels = []
         for item in dataset:
             user_id = item.user_id
-            label = torch.argmax(torch.tensor(user_id_to_scores[user_id])).item()
+            label = labels_by_user_id[user_id]
             text = self._format_history(item.conversation_history)
             texts.append(text)
             labels.append(label)
@@ -160,14 +186,17 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         print("[AttributePersonalizationSystem]    Loading text classification model...")
         self.text_classification_model.load_from_file(load_path / "text_classification_model")
         print("[AttributePersonalizationSystem]    Predicting attributes...")
-        predictions = self.text_classification_model.predict(texts) # TODO: predict multiple attributes
+        predictions = self.text_classification_model.predict(texts, batch_size=self.predict_batch_size) # TODO: predict multiple attributes
         print("[AttributePersonalizationSystem]    Attributes predicted.")
         self.text_classification_model.unload()
 
         print("[AttributePersonalizationSystem] 2. Generating responses...")
         generation_prompts = []
         for item, prediction in zip(dataset, predictions):
-            attribute = attributes[prediction]
+            attribute = attributes[prediction % len(self.attributes)]
+            side = ['avoid', 'follow'][prediction // len(self.attributes)]
+            if side == "avoid":
+                attribute = f"not {attribute}"
             generation_prompts.append([
                 {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=attribute)},
             ] + item.current_messages)

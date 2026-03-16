@@ -1,0 +1,17 @@
+defaults:
+  - attributes
+  - _self_
+
+judge:
+  _target_: llm_personalization.judge.ParsedRatingJudge
+  model: openai/gpt-oss-120b
+  tensor_parallel_size: 2
+  max_model_len: 32768
+  gpu_memory_utilization: 0.90
+  enable_thinking: true
+  sampling_params:
+    max_tokens: 4096
+    temperature: 1.0
+    top_p: 0.95
+
+input_path: data/judge_prompt_selection/responses_gpt-oss-120b_100_k10.csv

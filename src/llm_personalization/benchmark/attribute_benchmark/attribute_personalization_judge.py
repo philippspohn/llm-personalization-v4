@@ -51,7 +51,7 @@ class PersonalizationAttributeJudge(PersonalizationJudge):
             for attribute in self.user_id_to_response_style_attributes[user_id]:
                 score = scores[score_idx]
                 if attribute["side"] == "avoid":
-                    score = -score # or 11 - score? TODO
+                    score = -score
                 score_idx += 1
                 user_scores.append(score)
             final_scores.append(sum(user_scores) / len(user_scores))

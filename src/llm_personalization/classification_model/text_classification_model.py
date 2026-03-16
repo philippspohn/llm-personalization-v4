@@ -33,12 +33,20 @@ class TextClassificationModel:
         inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
         return self.model(**inputs).logits
 
-    def predict(self, texts: list[str]) -> list[int]:
+    def predict(self, texts: list[str], batch_size: int | None = None) -> list[int]:
         if self.model is None:
             raise ValueError("Model not loaded")
+        self.model.eval()
+        if batch_size is None:
+            with torch.no_grad():
+                logits = self.forward(texts)
+                return logits.argmax(dim=-1).tolist()
+        all_preds = []
         with torch.no_grad():
-            logits = self.forward(texts)
-            return logits.argmax(dim=-1).tolist()
+            for i in range(0, len(texts), batch_size):
+                logits = self.forward(texts[i:i + batch_size])
+                all_preds.extend(logits.argmax(dim=-1).tolist())
+        return all_preds
 
     def train(self, texts: list[str], labels: list[int],
               val_texts: list[str] | None = None, val_labels: list[int] | None = None,
