@@ -9,6 +9,7 @@ from llm_personalization.llm.llm_helper import LLMHelper
 from typing import Literal
 import json
 import torch
+import pandas as pd
 from llm_personalization.utils.gpu_monitor import log_gpu_usage
 
 # SYSTEM_PROMPT_TEMPLATE = """
@@ -37,8 +38,6 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         self.attribute_selection = attribute_selection
         self.text_classification_model_train_kwargs = text_classification_model_train_kwargs
         self.predict_batch_size = predict_batch_size
-        if attribute_selection == "margin":
-            print(f"[AttributePersonalizationSystem] Attribute selection set to: margin. Attribute list must be antonym pairs. E.g. {self.attributes[0]} - {self.attributes[1]}")
 
     def _format_history(self, history: list[list[dict[str, str]]]) -> str:
         text = ""
@@ -58,17 +57,25 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         with open(path, "r") as f:
             return json.load(f)
 
+
     def train(self, dataset: AttributePersonalizationDataset, judge: PersonalizationJudge, save_path: Path):
         # 1. Extract labels
         print("[AttributePersonalizationSystem] 1.   Extracting labels...")
         # 1.a. Generate responses for each item and attribute
         print("[AttributePersonalizationSystem] 1.a. Generating responses...")
         generation_prompts = []
-        for item in dataset:
+        generation_metadata = []
+        for i, item in enumerate(dataset):
             for attribute in self.attributes:
                 generation_prompts.append([
                     {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=attribute)},
                 ] + item.current_messages) # TODO: randomize range?
+                generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "follow", "current_messages": item.current_messages})
+                if self.attribute_selection == "margin":
+                    generation_prompts.append([
+                        {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=f"not {attribute}")},
+                    ] + item.current_messages)
+                    generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "avoid", "current_messages": item.current_messages})
 
         log_gpu_usage("Before LLM load")
         print("[AttributePersonalizationSystem]      Loading LLM helper...")
@@ -82,16 +89,11 @@ class AttributePersonalizationSystem(PersonalizationSystem):
 
         # 1.b. Judge responses
         print("[AttributePersonalizationSystem] 1.b. Judging responses...")
-        response_idx = 0
-        judge_requests = []
-        judge_user_ids = []
-        for item in dataset:
-            for attribute in self.attributes:
-                response = responses[response_idx]
-                response_idx += 1
-                messages = item.current_messages + [{"role": "assistant", "content": response}] # TODO: randomize range?
-                judge_requests.append(messages)
-                judge_user_ids.append(item.user_id)
+        judge_user_ids = [m["user_id"] for m in generation_metadata]
+        judge_requests = [
+            m["current_messages"] + [{"role": "assistant", "content": response.content}]
+            for m, response in zip(generation_metadata, responses)
+        ]
 
         log_gpu_usage("Before judge load")
         print("[AttributePersonalizationSystem]      Loading judge...")
@@ -105,49 +107,63 @@ class AttributePersonalizationSystem(PersonalizationSystem):
 
         # 1.c. Select labels
         print("[AttributePersonalizationSystem] 1.c. Selecting labels...")
-        label_idx = 0
-        labels_by_user_id = {}
-        for i, item in enumerate(dataset):
-            user_scores = []
-            for attribute in self.attributes:
-                score = raw_judge_scores[label_idx]
-                label_idx += 1
-                user_scores.append(score)
-            argmax_score = torch.argmax(torch.tensor(user_scores).abs()).item()
-            side = "avoid" if user_scores[argmax_score] < 0 else "follow"
-            label = argmax_score
-            if side == "follow":
-                label = label + len(self.attributes)
-            labels_by_user_id[item.user_id] = label
-            if i < 3:
-                avg_msg_length = sum(len(msg) for msg in item.conversation_history) / len(item.conversation_history)
-                print(f"User {item.user_id} history: {len(item.conversation_history)} messages, avg length: {avg_msg_length}")
-                print(f"User {item.user_id} current messages: {item.current_messages}")
-                print(f"Available attributes: {self.attributes}")
-                print(f"User {item.user_id} scores: {user_scores}") # TODO: should be zero-centered?
-                print(f"User {item.user_id} label: {argmax_score}")
-                print(f"User {item.user_id} label: {self.attributes[label % len(self.attributes)]}")
-                print(f"User {item.user_id} side: {['avoid', 'follow'][label // len(self.attributes)]}")
-                assert side == ['avoid', 'follow'][label // len(self.attributes)]
+        attr_to_idx = {attr: i for i, attr in enumerate(self.attributes)}
+        df = pd.DataFrame([{"user_id": m["user_id"], "attribute": m["attribute"], "side": m["side"]} for m in generation_metadata])
+        df["score"] = raw_judge_scores
 
-        # user_id_to_scores = {}
-        # if self.attribute_selection == "abs":
-        #     for judge_user_id, score in zip(judge_user_ids, raw_judge_scores):
-        #         if judge_user_id not in user_id_to_scores:
-        #             user_id_to_scores[judge_user_id] = []
-        #         user_id_to_scores[judge_user_id].append(score)
-        # elif self.attribute_selection == "margin":
-        #     # TODO: margin mode needs rework — current pairing logic assumes exactly 2 attributes
-        #     # and breaks when users have more. Revisit the score pairing strategy.
-        #     raise NotImplementedError("Margin attribute selection is not yet fully implemented")
-        #     for i in range(0, len(judge_user_ids), 2):
-        #         user_id = judge_user_ids[i]
-        #         score_positive = raw_judge_scores[i]
-        #         score_negative = raw_judge_scores[i + 1]
-        #         score_margin = score_positive - score_negative
-        #         if user_id not in user_id_to_scores:
-        #             user_id_to_scores[user_id] = []
-        #         user_id_to_scores[user_id].append(score_margin)
+        # Debug: check for None/NaN scores
+        none_count = sum(1 for s in raw_judge_scores if s is None)
+        nan_count = df["score"].isna().sum()
+        print(f"[AttributePersonalizationSystem]      None scores: {none_count}/{len(raw_judge_scores)}, NaN in df: {nan_count}/{len(df)}")
+
+        # Replace NaN scores with per-attribute mean so they don't get selected
+        if nan_count > 0:
+            df["score"] = df.groupby("attribute")["score"].transform(lambda s: s.fillna(s.mean()))
+            remaining_nan = df["score"].isna().sum()
+            if remaining_nan > 0:
+                df["score"] = df["score"].fillna(0)
+            print(f"[AttributePersonalizationSystem]      After NaN fill: {df['score'].isna().sum()} NaN remaining")
+
+        if self.attribute_selection == "abs":
+            # Pick the attribute with the highest absolute score per user, shifted by 5.5 so scores are centered around 0
+            df["centered_score"] = df["score"] - 5.5
+            best_idx = df.groupby("user_id")["centered_score"].apply(lambda s: s.abs().idxmax())
+            best = df.loc[best_idx].copy()
+            best["side"] = best["centered_score"].apply(lambda s: "avoid" if s < 0 else "follow")
+
+        elif self.attribute_selection == "margin":
+            # Compute margin = follow_score - avoid_score per (user, attribute), pick highest margin
+            pivoted = df.pivot_table(index=["user_id", "attribute"], columns="side", values="score").reset_index()
+            pivoted["margin"] = pivoted["follow"] - pivoted["avoid"]
+            nan_margins = pivoted["margin"].isna().sum()
+            print(f"[AttributePersonalizationSystem]      NaN margins: {nan_margins}/{len(pivoted)}")
+            if nan_margins > 0:
+                pivoted["margin"] = pivoted["margin"].fillna(0)
+            best_idx = pivoted.groupby("user_id")["margin"].apply(lambda s: s.abs().idxmax())
+            best = pivoted.loc[best_idx].copy()
+            best["side"] = best["margin"].apply(lambda m: "follow" if m > 0 else "avoid")
+
+        # Encode label: avoid = attr_idx, follow = attr_idx + len(attributes)
+        best["label"] = best.apply(
+            lambda row: attr_to_idx[row["attribute"]] + (len(self.attributes) if row["side"] == "follow" else 0), axis=1
+        )
+        labels_by_user_id = dict(zip(best["user_id"], best["label"]))
+
+        # Debug: label distribution
+        label_dist = pd.Series(list(labels_by_user_id.values())).value_counts().sort_index()
+        print(f"[AttributePersonalizationSystem]      Label distribution ({len(labels_by_user_id)} users, {len(label_dist)} classes used):")
+        for label, count in label_dist.items():
+            attr = self.attributes[label % len(self.attributes)]
+            side = ['avoid', 'follow'][label // len(self.attributes)]
+            print(f"        {label}: {attr} ({side}) = {count}")
+
+        # Debug: print first 3 users
+        for user_id in list(labels_by_user_id.keys())[:3]:
+            label = labels_by_user_id[user_id]
+            user_df = df[df["user_id"] == user_id]
+            print(f"User {user_id} scores: {dict(zip(user_df['attribute'], user_df['score']))}")
+            print(f"User {user_id} → {self.attributes[label % len(self.attributes)]} ({['avoid', 'follow'][label // len(self.attributes)]})")
+
 
         # 2. Train text classification model
         print("[AttributePersonalizationSystem] 2.   Training text classification model...")

@@ -1,13 +1,15 @@
 personalization_system:
   _target_: llm_personalization.personalization_system.attribute_personalization.attribute_personalization_system.AttributePersonalizationSystem
+  attribute_selection: margin
   text_classification_model_config:
     pooling: mean
     base_model: microsoft/deberta-v3-base
-    max_length: 2048
+    max_length: 512
+    dtype: float32
   text_classification_model_train_kwargs:
     batch_size: 4
     grad_accum_steps: 2
-    epochs: 1
+    epochs: 3
     lr: 2e-5
   llm_helper_config:
     model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8 # TODO: adjust
@@ -17,16 +19,26 @@ personalization_system:
     sampling_params:
       max_tokens: 2048
   attributes:  # response attributes the personalization system explores
-    - verbose
-    - enthusiastic
-    - open-ended
-    - tech-savvy
-    - highly constrained
-    - anxious
-    - transactional
-    - hypothetical
-    - unpolished
+    - emotionally neutral
+    - casual
+    - elaborate
+    - acknowledges uncertainty
     - prescriptive
+    - assumes no prior knowledge
+    - gentle
+    - persuasive
+    - presents multiple perspectives
+    - collaborative
+    # - verbose
+    # - enthusiastic
+    # - open-ended
+    # - tech-savvy
+    # - highly constrained
+    # - anxious
+    # - transactional
+    # - hypothetical
+    # - unpolished
+    # - prescriptive
   predict_batch_size: 32
 
     # - emotionally neutral
@@ -51,7 +63,7 @@ unpersonalized_llm_helper:
 attribute_personalization_dataset:
   _target_: llm_personalization.benchmark.attribute_benchmark.attribute_personalization_dataset.AttributePersonalizationLabeledDataset
   dataset_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_hf
-  train_limit: 1000
+  train_limit: 3000
   test_limit: 100
   history_max_len: 2
 

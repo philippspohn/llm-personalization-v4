@@ -3,12 +3,21 @@ from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTok
 from tqdm import tqdm
 import gc
 
+DTYPE_MAP = {
+    "float32": torch.float32,
+    "float16": torch.float16,
+    "bfloat16": torch.bfloat16,
+}
+
 class TextClassificationModel:
-    def __init__(self, num_classes: int, pooling: str = "mean", base_model: str = "answerdotai/ModernBERT-base", max_length: int | None = None):
+    def __init__(self, num_classes: int, pooling: str = "mean", base_model: str = "answerdotai/ModernBERT-base", max_length: int | None = None, dtype: str = "float32"):
         self.base_model = base_model
         self.num_classes = num_classes
         self.pooling = pooling
         self._max_length_override = max_length
+        if dtype not in DTYPE_MAP:
+            raise ValueError(f"Unknown dtype: {dtype}. Must be one of {list(DTYPE_MAP.keys())}")
+        self.dtype = DTYPE_MAP[dtype]
 
     def _tokenize(self, texts: list[str], track_truncation: bool = False) -> dict:
         inputs = self.tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=self.max_length)
@@ -75,16 +84,22 @@ class TextClassificationModel:
 
                 loss = self.model(**inputs).loss / grad_accum_steps
                 loss.backward()
-                total_loss += loss.item() * grad_accum_steps
+                step_loss = loss.item() * grad_accum_steps
+                total_loss += step_loss
+
+                if step % 10 == 0:
+                    grad_norm = sum(p.grad.norm().item() ** 2 for p in self.model.parameters() if p.grad is not None) ** 0.5
+                    print(f"    step {step}: loss={step_loss:.4f}, grad_norm={grad_norm:.4f}")
 
                 if (step + 1) % grad_accum_steps == 0 or i + batch_size >= len(texts):
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
                     optimizer.step()
                     optimizer.zero_grad()
 
             avg_train_loss = total_loss / (len(texts) / batch_size)
             if epoch == 0:
                 self._report_truncation()
-            
+
             if val_texts and val_labels:
                 # Validation loss
                 self.model.eval()
@@ -93,7 +108,7 @@ class TextClassificationModel:
                     val_inputs = {k: v.to(self.model.device) for k, v in val_inputs.items()}
                     val_inputs["labels"] = torch.tensor(val_labels, device=self.model.device)
                     val_loss = self.model(**val_inputs).loss.item()
-                
+
                 # Validation accuracy
                 val_preds = self.predict(val_texts)
                 val_acc = sum(p == l for p, l in zip(val_preds, val_labels)) / len(val_labels)
@@ -109,7 +124,7 @@ class TextClassificationModel:
 
 
     def load_from_file(self, path: str):
-        self.model = AutoModelForSequenceClassification.from_pretrained(path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(path, torch_dtype=self.dtype)
         self.tokenizer = AutoTokenizer.from_pretrained(path)
         self.max_length = self._max_length_override or self.model.config.max_position_embeddings
         if torch.cuda.is_available():
@@ -121,7 +136,7 @@ class TextClassificationModel:
         config.classifier_pooling = self.pooling
         config.num_labels = self.num_classes
         self.max_length = self._max_length_override or config.max_position_embeddings
-        self.model = AutoModelForSequenceClassification.from_pretrained(self.base_model, config=config)
+        self.model = AutoModelForSequenceClassification.from_pretrained(self.base_model, config=config, torch_dtype=self.dtype)
         if torch.cuda.is_available():
             self.model = self.model.cuda()
 
@@ -129,12 +144,12 @@ class TextClassificationModel:
     def unload(self) -> None:
         if self.model is None:
             return
-        
+
         del self.model
         del self.tokenizer
         self.model = None
         self.tokenizer = None
-        
+
         gc.collect()
 
         if torch.cuda.is_available():
