@@ -5,8 +5,16 @@ from tqdm import tqdm
 import os
 import gc
 import torch
+import logging
 from typing import Any
 from dataclasses import dataclass
+
+
+def suppress_vllm_logs():
+    for name in logging.Logger.manager.loggerDict:
+        if "vllm" in name:
+            logging.getLogger(name).setLevel(logging.WARNING)
+    logging.getLogger("vllm").setLevel(logging.WARNING)
 
 @dataclass
 class ModelResponse:
@@ -35,6 +43,7 @@ class LLMHelper:
         self.sampling_params = sampling_params or {}
         
     def load(self):
+        suppress_vllm_logs()
         self.llm = LLM(
             model=self.model,
             tensor_parallel_size=self.tensor_parallel_size,

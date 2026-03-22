@@ -34,10 +34,12 @@ class AttributePersonalizationLabeledDataset(): # TODO: user pytorch dataset?
     def __getitem__(self, index: int) -> PersonalizationLabeledItem:
         row = self.dataset[index]
         conversation_history = row["conversation_history"] if self.history_max_len is None else row["conversation_history"][:self.history_max_len]
+        # Keep only the first user message per conversation for cleaner classifier input
+        conversation_history = [[msg for msg in conv if msg["role"] == "user"][:1] for conv in conversation_history]
         return PersonalizationLabeledItem(
             user_id=row["user_id"],
             conversation_history=conversation_history,
-            current_messages=row["current_messages"][:-1],  # strip trailing assistant turn; callers append their own (TODO)
+            current_messages=row["current_messages"][:1],
             user_attributes=row["user_attributes"],
         )
 

@@ -1,0 +1,10 @@
+defaults:
+  - llm: gpt-oss-120b
+  - _self_
+
+num_train_users: 2000
+num_test_users: 3000
+num_conversations_per_user: 20
+first_message_only: true
+train_output_path: data/synthetic_conversations_persona/gpt-oss-120b_persona_2000_3000_first_message_only_train.jsonl
+test_output_path: data/synthetic_conversations_persona/gpt-oss-120b_persona_2000_3000_first_message_only_test.jsonl

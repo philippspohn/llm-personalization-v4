@@ -19,3 +19,20 @@ class AttributeJudge(ABC):
     @abstractmethod
     def load(self) -> None:
         pass
+
+
+class PersonaJudge(ABC):
+    @abstractmethod
+    def judge_response_persona(self, conversations: list[Messages], personas: list[str]) -> list[float | None]:
+        """
+        Judge how well the last message in a conversation is personalized for a given persona.
+        """
+        pass
+
+    @abstractmethod
+    def unload(self) -> None:
+        pass
+
+    @abstractmethod
+    def load(self) -> None:
+        pass

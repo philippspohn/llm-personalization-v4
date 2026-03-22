@@ -4,11 +4,16 @@ from transformers import AutoTokenizer
 import gc
 import re
 import torch
-from .judge import AttributeJudge
+import logging
+from .judge import AttributeJudge, PersonaJudge
 from typing import Any
-from .prompt_templates import JUDGE_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT_THINKING, JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE, JUDGE_USER_TEMPLATE_PROMPT_ATTRIBUTE
+from .prompt_templates import (
+    JUDGE_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT_THINKING,
+    JUDGE_USER_TEMPLATE_RESPONSE_ATTRIBUTE, JUDGE_USER_TEMPLATE_PROMPT_ATTRIBUTE,
+    PERSONA_JUDGE_SYSTEM_PROMPT, PERSONA_JUDGE_SYSTEM_PROMPT_THINKING, PERSONA_JUDGE_USER_TEMPLATE,
+)
 
-class ParsedRatingJudge(AttributeJudge):
+class ParsedRatingJudge(AttributeJudge, PersonaJudge):
     llm: None | LLM = None
     tokenizer: None | AutoTokenizer = None
 
@@ -35,6 +40,8 @@ class ParsedRatingJudge(AttributeJudge):
         self.retries = retries
 
     def load(self):
+        from llm_personalization.llm.llm_helper import suppress_vllm_logs
+        suppress_vllm_logs()
         self.llm = LLM(
             model=self.model,
             tensor_parallel_size=self.tensor_parallel_size,
@@ -160,5 +167,28 @@ class ParsedRatingJudge(AttributeJudge):
                 enable_thinking=self.enable_thinking,
             )
             judge_prompts.append(full_prompt)
-            
+
+        return self.judge_manual(judge_prompts)
+
+    def judge_response_persona(self, conversations: list[list[dict[str, str]]], personas: list[str]) -> list[int | None]:
+        judge_prompts = []
+
+        for messages, persona in zip(conversations, personas):
+            if len(messages) < 2:
+                raise ValueError(f"Conversation has less than 2 messages: {messages}")
+            if messages[-1]["role"] != "assistant" or messages[-2]["role"] != "user":
+                raise ValueError(f"Last message must be an assistant response and the second to last message must be a user prompt.")
+            message_string = ""
+            for message in messages[:-1]:
+                message_string += f"<message role='{message['role']}'>{message['content']}</message>\n"
+            system_prompt = PERSONA_JUDGE_SYSTEM_PROMPT_THINKING if self.enable_thinking else PERSONA_JUDGE_SYSTEM_PROMPT
+            user_prompt = PERSONA_JUDGE_USER_TEMPLATE.format(conversation=message_string, response=messages[-1]["content"], persona=persona)
+            full_prompt = self.tokenizer.apply_chat_template(
+                [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=self.enable_thinking,
+            )
+            judge_prompts.append(full_prompt)
+
         return self.judge_manual(judge_prompts)

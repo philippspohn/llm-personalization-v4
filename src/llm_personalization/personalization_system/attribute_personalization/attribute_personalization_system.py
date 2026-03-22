@@ -12,20 +12,26 @@ import torch
 import pandas as pd
 from llm_personalization.utils.gpu_monitor import log_gpu_usage
 
-# SYSTEM_PROMPT_TEMPLATE = """
-# Adopt the following communication style attributes in all your responses:
-
-# {attributes}
-
-# Let these attributes naturally shape your tone, word choice, and structure.
-# """
 SYSTEM_PROMPT_TEMPLATE = """
-Adopt the following communication style attribute in your responses
+Your task is to respond to the user's prompt while strictly adhering to the following response principle:
+{direction} {attribute}
 
-Attribute: {attribute}
-
-Let this attribute naturally shape your tone, word choice, and structure.
+You must {direction_instruction}.
 """
+
+def _format_system_prompt(attribute: str, side: str) -> str:
+    if side == "follow":
+        return SYSTEM_PROMPT_TEMPLATE.format(
+            direction="FOLLOW",
+            attribute=attribute,
+            direction_instruction=f"demonstrate strong {attribute} in your response"
+        )
+    else:
+        return SYSTEM_PROMPT_TEMPLATE.format(
+            direction="AVOID",
+            attribute=attribute,
+            direction_instruction=f"avoid any {attribute} in your response"
+        )
 
 
 class AttributePersonalizationSystem(PersonalizationSystem):
@@ -58,7 +64,7 @@ class AttributePersonalizationSystem(PersonalizationSystem):
             return json.load(f)
 
 
-    def train(self, dataset: AttributePersonalizationDataset, judge: PersonalizationJudge, save_path: Path):
+    def train(self, dataset: AttributePersonalizationDataset, judge: PersonalizationJudge, save_path: Path, gt_user_attributes: dict[str, list[dict[str, str]]] | None = None):
         # 1. Extract labels
         print("[AttributePersonalizationSystem] 1.   Extracting labels...")
         # 1.a. Generate responses for each item and attribute
@@ -68,12 +74,12 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         for i, item in enumerate(dataset):
             for attribute in self.attributes:
                 generation_prompts.append([
-                    {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=attribute)},
+                    {"role": "system", "content": _format_system_prompt(attribute, "follow")},
                 ] + item.current_messages) # TODO: randomize range?
                 generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "follow", "current_messages": item.current_messages})
                 if self.attribute_selection == "margin":
                     generation_prompts.append([
-                        {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=f"not {attribute}")},
+                        {"role": "system", "content": _format_system_prompt(attribute, "avoid")},
                     ] + item.current_messages)
                     generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "avoid", "current_messages": item.current_messages})
 
@@ -165,6 +171,27 @@ class AttributePersonalizationSystem(PersonalizationSystem):
             print(f"User {user_id} → {self.attributes[label % len(self.attributes)]} ({['avoid', 'follow'][label // len(self.attributes)]})")
 
 
+        # Debug: judge accuracy (how well does label selection match GT)
+        if gt_user_attributes is not None:
+            correct = 0
+            total = 0
+            attr_correct = 0
+            for user_id, label in labels_by_user_id.items():
+                if user_id in gt_user_attributes:
+                    gt_attrs = gt_user_attributes[user_id]
+                    # GT is list of {"attribute": ..., "side": ...}
+                    for gt in gt_attrs:
+                        if gt["attribute"] in attr_to_idx:
+                            gt_label = attr_to_idx[gt["attribute"]] + (len(self.attributes) if gt["side"] == "follow" else 0)
+                            total += 1
+                            if label == gt_label:
+                                correct += 1
+                            if self.attributes[label % len(self.attributes)] == gt["attribute"]:
+                                attr_correct += 1
+            if total > 0:
+                print(f"[AttributePersonalizationSystem]      JUDGE ACCURACY (label matches GT): {correct}/{total} = {correct/total:.4f}")
+                print(f"[AttributePersonalizationSystem]      JUDGE ATTR ACCURACY (attribute only, ignoring side): {attr_correct}/{total} = {attr_correct/total:.4f}")
+
         # 2. Train text classification model
         print("[AttributePersonalizationSystem] 2.   Training text classification model...")
         print("[AttributePersonalizationSystem] 2.a. Formatting texts...")
@@ -189,7 +216,7 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         self._save_attributes(save_path / "attributes.json", self.attributes)
         # TODO save config too?
 
-    def evaluate(self, dataset: AttributePersonalizationDataset, load_path: Path) -> list[str]:
+    def evaluate(self, dataset: AttributePersonalizationDataset, load_path: Path, gt_user_attributes: dict[str, list[dict[str, str]]] | None = None) -> list[str]:
         print("[AttributePersonalizationSystem] Evaluating text classification model...")
         print("[AttributePersonalizationSystem] 1. Predicting attributes...")
 
@@ -206,15 +233,34 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         print("[AttributePersonalizationSystem]    Attributes predicted.")
         self.text_classification_model.unload()
 
+        # Debug: test accuracy (how well does classifier match GT)
+        if gt_user_attributes is not None:
+            attr_to_idx = {attr: i for i, attr in enumerate(attributes)}
+            correct = 0
+            attr_correct = 0
+            total = 0
+            for item, prediction in zip(dataset, predictions):
+                if item.user_id in gt_user_attributes:
+                    gt_attrs = gt_user_attributes[item.user_id]
+                    for gt in gt_attrs:
+                        if gt["attribute"] in attr_to_idx:
+                            gt_label = attr_to_idx[gt["attribute"]] + (len(attributes) if gt["side"] == "follow" else 0)
+                            total += 1
+                            if prediction == gt_label:
+                                correct += 1
+                            if attributes[prediction % len(attributes)] == gt["attribute"]:
+                                attr_correct += 1
+            if total > 0:
+                print(f"[AttributePersonalizationSystem]    TEST ACCURACY (label matches GT): {correct}/{total} = {correct/total:.4f}")
+                print(f"[AttributePersonalizationSystem]    TEST ATTR ACCURACY (attribute only, ignoring side): {attr_correct}/{total} = {attr_correct/total:.4f}")
+
         print("[AttributePersonalizationSystem] 2. Generating responses...")
         generation_prompts = []
         for item, prediction in zip(dataset, predictions):
             attribute = attributes[prediction % len(self.attributes)]
             side = ['avoid', 'follow'][prediction // len(self.attributes)]
-            if side == "avoid":
-                attribute = f"not {attribute}"
             generation_prompts.append([
-                {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(attribute=attribute)},
+                {"role": "system", "content": _format_system_prompt(attribute, side)},
             ] + item.current_messages)
 
         print("[AttributePersonalizationSystem]    Loading LLM helper...")

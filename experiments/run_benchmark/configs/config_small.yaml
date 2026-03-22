@@ -7,18 +7,18 @@ personalization_system:
     max_length: 8192
     dtype: float32
   text_classification_model_train_kwargs:
-    batch_size: 16
+    batch_size: 4
     grad_accum_steps: 1
-    epochs: 3
+    epochs: 1
     lr: 2e-5
   llm_helper_config:
-    model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8 # TODO: adjust
+    model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
     tensor_parallel_size: 2
     max_model_len: 32768
     gpu_memory_utilization: 0.90
     sampling_params:
       max_tokens: 2048
-  attributes:  # response attributes the personalization system explores
+  attributes:
     - emotionally neutral
     - casual
     - elaborate
@@ -29,28 +29,8 @@ personalization_system:
     - persuasive
     - presents multiple perspectives
     - collaborative
-    # - verbose
-    # - enthusiastic
-    # - open-ended
-    # - tech-savvy
-    # - highly constrained
-    # - anxious
-    # - transactional
-    # - hypothetical
-    # - unpolished
-    # - prescriptive
   predict_batch_size: 32
 
-    # - emotionally neutral
-    # - casual
-    # - elaborate
-    # - acknowledges uncertainty
-    # - prescriptive
-    # - assumes no prior knowledge
-    # - gentle
-    # - persuasive
-    # - presents multiple perspectives
-    # - collaborative
 unpersonalized_llm_helper:
   _target_: llm_personalization.llm.llm_helper.LLMHelper
   model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
@@ -63,10 +43,9 @@ unpersonalized_llm_helper:
 attribute_personalization_dataset:
   _target_: llm_personalization.benchmark.attribute_benchmark.attribute_personalization_dataset.AttributePersonalizationLabeledDataset
   dataset_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_hf
-  train_limit: 3000
-  test_limit: 100
+  train_limit: 10
+  test_limit: 10
   history_max_len: 2
-
 
 attribute_judge:
   _target_: llm_personalization.judge.ParsedRatingJudge
@@ -80,7 +59,7 @@ attribute_judge:
     temperature: 1.0
     top_p: 0.95
 
-output_dir: data/run_benchmark/{timestamp}
+output_dir: data/run_benchmark/{timestamp}_small
 
 num_worlds: 1
 world_matrix_type: permutation
@@ -118,8 +97,8 @@ persona_personalization_dataset:
   _target_: llm_personalization.benchmark.persona_benchmark.persona_personalization_dataset.PersonaPersonalizationLabeledDataset
   train_path: data/synthetic_conversations_persona/gpt-oss-120b_persona_2000_3000_first_message_only_train.jsonl
   test_path: data/synthetic_conversations_persona/gpt-oss-120b_persona_2000_3000_first_message_only_test.jsonl
-  train_limit: 3000
-  test_limit: 100
+  train_limit: 10
+  test_limit: 10
   history_max_len: 2
 
 persona_judge:
@@ -143,9 +122,9 @@ persona_personalization_system:
     max_length: 8192
     dtype: float32
   text_classification_model_train_kwargs:
-    batch_size: 16
+    batch_size: 4
     grad_accum_steps: 1
-    epochs: 3
+    epochs: 1
     lr: 2e-5
   llm_helper_config:
     model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
@@ -171,5 +150,5 @@ persona_personalization_system:
 robustness:
   include_mmlu_pro: true
   include_truthfulqa: true
-  mmlu_pro_limit: 500
-  truthfulqa_limit: 500
+  mmlu_pro_limit: 20
+  truthfulqa_limit: 20

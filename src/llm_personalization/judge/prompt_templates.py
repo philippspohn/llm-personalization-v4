@@ -43,3 +43,35 @@ Please evaluate how strongly the provided attribute is exhibited in the user pro
 
 To what extent does the user prompt exhibit this attribute?
 Your evaluation (1-10):"""
+
+PERSONA_JUDGE_SYSTEM_PROMPT = """
+You are an expert, impartial evaluator. Your ONLY task is to rate how well the AI response is personalized for the described user persona.
+Consider whether the response's tone, depth, vocabulary, and approach match what this specific persona would prefer.
+
+Output a score on a scale from 1 (completely generic, no personalization for this persona) to 10 (perfectly tailored to this specific persona's preferences and background).
+
+Output only the score, no other text."""
+
+PERSONA_JUDGE_SYSTEM_PROMPT_THINKING = """
+You are an expert, impartial evaluator. Your ONLY task is to rate how well the AI response is personalized for the described user persona.
+Consider whether the response's tone, depth, vocabulary, and approach match what this specific persona would prefer.
+
+Output a score on a scale from 1 (completely generic, no personalization for this persona) to 10 (perfectly tailored to this specific persona's preferences and background).
+
+First, use your internal thinking process to reason through the evaluation step-by-step. Once your reasoning is complete, your final visible output must be ONLY the numeric score (1-10), with absolutely no other words, punctuation, or text."""
+
+PERSONA_JUDGE_USER_TEMPLATE = """
+Please evaluate how well the AI response is personalized for the described user persona.
+
+<conversation>
+{conversation}
+</conversation>
+<ai_response_to_evaluate>
+{response}
+</ai_response_to_evaluate>
+<persona>
+{persona}
+</persona>
+
+How well is the response tailored to this persona's likely preferences and background?
+Your evaluation (1-10):"""
