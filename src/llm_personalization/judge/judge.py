@@ -6,7 +6,7 @@ type Messages = list[dict[str, str]]
 
 class AttributeJudge(ABC):
     @abstractmethod
-    def judge_response_attribute(self, conversations: list[Messages], attributes: list[str]) -> list[float | None]:
+    def judge_response_attribute(self, conversations: list[Messages], attributes: list[str]) -> list[float | None]:  # scores on 1-10 scale
         """
         Judge the compliance of a list of the last message in a conversation with a given attribute.
         """

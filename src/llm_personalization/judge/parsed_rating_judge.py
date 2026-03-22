@@ -74,17 +74,17 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
         print("[RatingJudge] Judge model unloaded")
 
 
-    def _parse_score(self, output: RequestOutput) -> int | None:
+    def _parse_score(self, output: RequestOutput) -> float | None:
         text = output.outputs[0].text.strip()
-        matches = re.findall(r'\b(10|[1-9])\b', text)
+        matches = re.findall(r'\b(100|[1-9]\d?)\b', text)
         if matches:
             score = int(matches[-1])
-            if 1 <= score <= 10:
-                return score
+            if 1 <= score <= 100:
+                return score / 10.0
         return None
 
-    def judge_manual(self, judge_prompts: list[str]) -> list[int | None]:
-        scores: list[int | None] = [None] * len(judge_prompts)
+    def judge_manual(self, judge_prompts: list[str]) -> list[float | None]:
+        scores: list[float | None] = [None] * len(judge_prompts)
         original_prompts = list(judge_prompts)
         pending_indices = list(range(len(judge_prompts)))
 
@@ -126,7 +126,7 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
 
         return scores
 
-    def judge_response_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[int | None]:
+    def judge_response_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[float | None]:
         judge_prompts = []
 
         for messages, attribute in zip(conversations, attributes):
@@ -149,7 +149,7 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
             
         return self.judge_manual(judge_prompts)
 
-    def judge_user_prompt_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[int | None]:
+    def judge_user_prompt_attribute(self, conversations: list[list[dict[str, str]]], attributes: list[str]) -> list[float | None]:
         judge_prompts = []
 
         for messages, attribute in zip(conversations, attributes):
@@ -170,7 +170,7 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
 
         return self.judge_manual(judge_prompts)
 
-    def judge_response_persona(self, conversations: list[list[dict[str, str]]], personas: list[str]) -> list[int | None]:
+    def judge_response_persona(self, conversations: list[list[dict[str, str]]], personas: list[str]) -> list[float | None]:
         judge_prompts = []
 
         for messages, persona in zip(conversations, personas):
