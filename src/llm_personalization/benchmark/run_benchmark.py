@@ -16,6 +16,7 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import json
 from llm_personalization.utils.gpu_monitor import log_gpu_usage
 from llm_personalization.llm.llm_helper import LLMHelper
 
@@ -91,7 +92,8 @@ def run_benchmark(
     num_worlds = benchmark_config.num_worlds
     world_matrix_type = benchmark_config.world_matrix_type
     skip_training = benchmark_config.get("skip_training", False)
-    
+    results = {"timestamp": timestamp}
+
     user_attributes = list(benchmark_config.user_attributes)
     num_user_attributes_per_user = benchmark_config.num_attributes_per_user # TODO
 
@@ -193,6 +195,16 @@ def run_benchmark(
         print(f"    - Tie rate: {tie_rate:.4f}")
         print(f"    - Loss rate: {1 - win_rate - tie_rate:.4f}")
 
+        results.setdefault("attribute_benchmark", {})[f"world_{world_idx}"] = {
+            "personalized_score_mean": scores.mean().item(),
+            "personalized_score_std": scores.std().item(),
+            "unpersonalized_score_mean": unpersonalized_scores.mean().item(),
+            "unpersonalized_score_std": unpersonalized_scores.std().item(),
+            "win_rate": win_rate,
+            "tie_rate": tie_rate,
+            "loss_rate": 1 - win_rate - tie_rate,
+        }
+
         _plot_score_distribution(scores, unpersonalized_scores, output_dir_results, world_idx)
     # Persona Personalization Benchmark
     if benchmark_config.get("persona_personalization_dataset") is not None:
@@ -273,6 +285,16 @@ def run_benchmark(
         print(f"    - Tie rate: {persona_tie_rate:.4f}")
         print(f"    - Loss rate: {1 - persona_win_rate - persona_tie_rate:.4f}")
 
+        results["persona_benchmark"] = {
+            "personalized_score_mean": persona_scores.mean().item(),
+            "personalized_score_std": persona_scores.std().item(),
+            "unpersonalized_score_mean": persona_unpersonalized_scores.mean().item(),
+            "unpersonalized_score_std": persona_unpersonalized_scores.std().item(),
+            "win_rate": persona_win_rate,
+            "tie_rate": persona_tie_rate,
+            "loss_rate": 1 - persona_win_rate - persona_tie_rate,
+        }
+
         _plot_score_distribution(persona_scores, persona_unpersonalized_scores, output_dir_results, world_idx="persona")
 
     # Robustness Benchmark
@@ -283,8 +305,10 @@ def run_benchmark(
         robustness_questions = load_robustness_questions(
             include_mmlu_pro=robustness_config.get("include_mmlu_pro", True),
             include_truthfulqa=robustness_config.get("include_truthfulqa", True),
+            include_bbq=robustness_config.get("include_bbq", False),
             mmlu_pro_limit=robustness_config.get("mmlu_pro_limit", None),
             truthfulqa_limit=robustness_config.get("truthfulqa_limit", None),
+            bbq_limit=robustness_config.get("bbq_limit", None),
             seed=benchmark_config.get("seed", 42),
         )
         print(f"[Benchmark]    Loaded {len(robustness_questions)} robustness questions")
@@ -314,19 +338,25 @@ def run_benchmark(
         unpersonalized_llm_helper.unload()
         log_gpu_usage("After unpersonalized robustness responses")
 
-        unpersonalized_correct = {"mmlu_pro": 0, "truthfulqa": 0}
-        unpersonalized_total = {"mmlu_pro": 0, "truthfulqa": 0}
+        unpersonalized_correct = {"mmlu_pro": 0, "truthfulqa": 0, "bbq": 0}
+        unpersonalized_total = {"mmlu_pro": 0, "truthfulqa": 0, "bbq": 0}
         for q, resp in zip(robustness_questions, unpersonalized_robustness_responses):
             parsed = parse_answer_letter(resp.content)
             unpersonalized_total[q.source] += 1
             if parsed == q.correct_letter:
                 unpersonalized_correct[q.source] += 1
 
+        robustness_results = {"unpersonalized": {}}
         print(f"[Benchmark]    Unpersonalized robustness results:")
-        for source in ["mmlu_pro", "truthfulqa"]:
+        for source in ["mmlu_pro", "truthfulqa", "bbq"]:
             if unpersonalized_total[source] > 0:
                 acc = unpersonalized_correct[source] / unpersonalized_total[source]
                 print(f"      {source}: {unpersonalized_correct[source]}/{unpersonalized_total[source]} = {acc:.4f}")
+                robustness_results["unpersonalized"][source] = {
+                    "correct": unpersonalized_correct[source],
+                    "total": unpersonalized_total[source],
+                    "accuracy": acc,
+                }
 
         # Evaluate each personalized system
         for system_name, system, load_path, robustness_dataset in robustness_systems:
@@ -335,8 +365,8 @@ def run_benchmark(
             robustness_responses = system.evaluate(robustness_dataset, load_path)
             log_gpu_usage(f"After {system_name} robustness evaluate")
 
-            correct = {"mmlu_pro": 0, "truthfulqa": 0}
-            total = {"mmlu_pro": 0, "truthfulqa": 0}
+            correct = {"mmlu_pro": 0, "truthfulqa": 0, "bbq": 0}
+            total = {"mmlu_pro": 0, "truthfulqa": 0, "bbq": 0}
             for i, resp in enumerate(robustness_responses):
                 q = robustness_dataset.get_question(i)
                 parsed = parse_answer_letter(resp)
@@ -344,11 +374,26 @@ def run_benchmark(
                 if parsed == q.correct_letter:
                     correct[q.source] += 1
 
+            robustness_results[system_name] = {}
             print(f"[Benchmark]    Robustness results for {system_name} system:")
-            for source in ["mmlu_pro", "truthfulqa"]:
+            for source in ["mmlu_pro", "truthfulqa", "bbq"]:
                 if total[source] > 0:
                     acc = correct[source] / total[source]
                     baseline_acc = unpersonalized_correct[source] / unpersonalized_total[source] if unpersonalized_total[source] > 0 else 0
                     delta = acc - baseline_acc
                     print(f"      {source}: {correct[source]}/{total[source]} = {acc:.4f} (delta vs unpersonalized: {delta:+.4f})")
+                    robustness_results[system_name][source] = {
+                        "correct": correct[source],
+                        "total": total[source],
+                        "accuracy": acc,
+                        "delta_vs_unpersonalized": delta,
+                    }
+
+        results["robustness_benchmark"] = robustness_results
+
+    # Save all results
+    results_path = output_dir_results / "results.json"
+    with open(results_path, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"[Benchmark] Results saved to {results_path}")
 

@@ -171,5 +171,7 @@ persona_personalization_system:
 robustness:
   include_mmlu_pro: true
   include_truthfulqa: true
+  include_bbq: true
   mmlu_pro_limit: 500
   truthfulqa_limit: 500
+  bbq_limit: 500

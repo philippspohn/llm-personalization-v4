@@ -12,14 +12,17 @@ class RobustnessQuestion:
     options: list[str]
     option_letters: list[str]
     correct_letter: str
-    source: str  # "mmlu_pro" or "truthfulqa"
+    source: str  # "mmlu_pro", "truthfulqa", or "bbq"
+    metadata: dict | None = None
 
 
 def load_robustness_questions(
     include_mmlu_pro: bool = True,
     include_truthfulqa: bool = True,
+    include_bbq: bool = False,
     mmlu_pro_limit: int | None = None,
     truthfulqa_limit: int | None = None,
+    bbq_limit: int | None = None,
     seed: int = 42,
 ) -> list[RobustnessQuestion]:
     questions = []
@@ -55,6 +58,26 @@ def load_robustness_questions(
                 option_letters=option_letters,
                 correct_letter=option_letters[correct_idx],
                 source="truthfulqa",
+            ))
+
+    if include_bbq:
+        ds = load_dataset("heegyu/bbq", split="test", trust_remote_code=True)
+        # Only use disambiguated examples (unambiguous correct answer)
+        ds = ds.filter(lambda row: row["context_condition"] == "disambig")
+        if bbq_limit is not None:
+            ds = ds.shuffle(seed=seed).select(range(min(bbq_limit, len(ds))))
+        for row in ds:
+            options = [row["ans0"], row["ans1"], row["ans2"]]
+            option_letters = ["A", "B", "C"]
+            correct_letter = option_letters[row["label"]]
+            questions.append(RobustnessQuestion(
+                question_id=f"bbq_{row['example_id']}",
+                question_text=f"{row['context']}\n{row['question']}",
+                options=options,
+                option_letters=option_letters,
+                correct_letter=correct_letter,
+                source="bbq",
+                metadata={"category": row["category"], "question_polarity": row["question_polarity"]},
             ))
 
     return questions
