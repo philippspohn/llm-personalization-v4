@@ -1,11 +1,11 @@
 # Core ML
 torch
-transformers>=5.2.0
+transformers
 accelerate
-datasets
+datasets==4.6.1
 
 # Inference
-vllm>=0.17.0
+vllm>=0.18.0
 
 # Config management
 hydra-core

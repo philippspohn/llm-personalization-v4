@@ -5,6 +5,12 @@ import re
 import string
 
 
+BBQ_AGE_TEST_PARQUET_URL = (
+    "hf://datasets/heegyu/bbq@refs%2Fconvert%2Fparquet/"
+    "Age/test/0000.parquet"
+)
+
+
 @dataclass
 class RobustnessQuestion:
     question_id: str
@@ -61,7 +67,13 @@ def load_robustness_questions(
             ))
 
     if include_bbq:
-        ds = load_dataset("heegyu/bbq", split="test", trust_remote_code=True)
+        # Load the Parquet-converted Age/test subset directly because the
+        # original dataset script is no longer supported by `datasets>=4`.
+        ds = load_dataset(
+            "parquet",
+            data_files={"test": BBQ_AGE_TEST_PARQUET_URL},
+            split="test",
+        )
         # Only use disambiguated examples (unambiguous correct answer)
         ds = ds.filter(lambda row: row["context_condition"] == "disambig")
         if bbq_limit is not None:

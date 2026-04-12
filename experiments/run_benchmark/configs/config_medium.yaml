@@ -13,7 +13,7 @@ personalization_system:
     lr: 2e-5
   llm_helper_config:
     model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
-    tensor_parallel_size: 2
+    tensor_parallel_size: 4
     max_model_len: 32768
     gpu_memory_utilization: 0.90
     sampling_params:
@@ -34,7 +34,7 @@ personalization_system:
 unpersonalized_llm_helper:
   _target_: llm_personalization.llm.llm_helper.LLMHelper
   model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
-  tensor_parallel_size: 2
+  tensor_parallel_size: 4
   max_model_len: 32768
   gpu_memory_utilization: 0.90
   sampling_params:
@@ -50,7 +50,7 @@ attribute_personalization_dataset:
 attribute_judge:
   _target_: llm_personalization.judge.ParsedRatingJudge
   model: openai/gpt-oss-120b
-  tensor_parallel_size: 2
+  tensor_parallel_size: 4
   max_model_len: 32768
   gpu_memory_utilization: 0.90
   enable_thinking: true
@@ -104,7 +104,7 @@ persona_personalization_dataset:
 persona_judge:
   _target_: llm_personalization.judge.ParsedRatingJudge
   model: openai/gpt-oss-120b
-  tensor_parallel_size: 2
+  tensor_parallel_size: 4
   max_model_len: 32768
   gpu_memory_utilization: 0.90
   enable_thinking: true
@@ -128,7 +128,7 @@ persona_personalization_system:
     lr: 2e-5
   llm_helper_config:
     model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
-    tensor_parallel_size: 2
+    tensor_parallel_size: 4
     max_model_len: 32768
     gpu_memory_utilization: 0.90
     sampling_params:

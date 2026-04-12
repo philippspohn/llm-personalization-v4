@@ -35,7 +35,7 @@ def _format_system_prompt(attribute: str, side: str) -> str:
 
 
 class AttributePersonalizationSystem(PersonalizationSystem):
-    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "margin"] = "abs", text_classification_model_train_kwargs: dict = {}, predict_batch_size: int | None = None):
+    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "abs_two_sided", "margin"] = "abs", text_classification_model_train_kwargs: dict = {}, predict_batch_size: int | None = None):
         self.text_classification_model_config = text_classification_model_config
         self.llm_helper_config = llm_helper_config
         self.text_classification_model = TextClassificationModel(**self.text_classification_model_config, num_classes=len(attributes)*2) # 2 classes per attribute (avoid/follow)
@@ -77,7 +77,7 @@ class AttributePersonalizationSystem(PersonalizationSystem):
                     {"role": "system", "content": _format_system_prompt(attribute, "follow")},
                 ] + item.current_messages) # TODO: randomize range?
                 generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "follow", "current_messages": item.current_messages})
-                if self.attribute_selection == "margin":
+                if self.attribute_selection in ("margin", "abs_two_sided"):
                     generation_prompts.append([
                         {"role": "system", "content": _format_system_prompt(attribute, "avoid")},
                     ] + item.current_messages)
@@ -136,6 +136,12 @@ class AttributePersonalizationSystem(PersonalizationSystem):
             best_idx = df.groupby("user_id")["centered_score"].apply(lambda s: s.abs().idxmax())
             best = df.loc[best_idx].copy()
             best["side"] = best["centered_score"].apply(lambda s: "avoid" if s < 0 else "follow")
+
+        elif self.attribute_selection == "abs_two_sided":
+            # Generate both follow and avoid probes, then pick the (attribute, side) with the highest raw score per user
+            best_idx = df.groupby("user_id")["score"].idxmax()
+            best = df.loc[best_idx].copy()
+            # side is already set from generation_metadata ("follow" or "avoid")
 
         elif self.attribute_selection == "margin":
             # Compute margin = follow_score - avoid_score per (user, attribute), pick highest margin
