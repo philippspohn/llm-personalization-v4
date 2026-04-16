@@ -9,8 +9,10 @@ generator:
   model: openai/gpt-oss-120b
   tensor_parallel_size: 2
   max_model_len: 32768
-  gpu_memory_utilization: 0.90
+  gpu_memory_utilization: 0.85
   sampling_params:
     max_tokens: 4096
+  vllm_kwargs:
+    disable_custom_all_reduce: true
 
 output_path: data/judge_prompt_selection/responses_gpt-oss-120b_100_k10.csv

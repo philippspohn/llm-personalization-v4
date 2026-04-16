@@ -35,7 +35,7 @@ def _format_system_prompt(attribute: str, side: str) -> str:
 
 
 class AttributePersonalizationSystem(PersonalizationSystem):
-    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "abs_two_sided", "margin"] = "abs", text_classification_model_train_kwargs: dict = {}, predict_batch_size: int | None = None):
+    def __init__(self, text_classification_model_config: dict, llm_helper_config: dict, attributes: list[str], attribute_selection: Literal["abs", "abs_two_sided", "margin", "regression"] = "abs", text_classification_model_train_kwargs: dict = {}, predict_batch_size: int | None = None):
         self.text_classification_model_config = text_classification_model_config
         self.llm_helper_config = llm_helper_config
         self.text_classification_model = TextClassificationModel(**self.text_classification_model_config, num_classes=len(attributes)*2) # 2 classes per attribute (avoid/follow)
@@ -77,7 +77,7 @@ class AttributePersonalizationSystem(PersonalizationSystem):
                     {"role": "system", "content": _format_system_prompt(attribute, "follow")},
                 ] + item.current_messages) # TODO: randomize range?
                 generation_metadata.append({"user_id": item.user_id, "attribute": attribute, "side": "follow", "current_messages": item.current_messages})
-                if self.attribute_selection in ("margin", "abs_two_sided"):
+                if self.attribute_selection in ("margin", "abs_two_sided", "regression"):
                     generation_prompts.append([
                         {"role": "system", "content": _format_system_prompt(attribute, "avoid")},
                     ] + item.current_messages)
@@ -143,6 +143,21 @@ class AttributePersonalizationSystem(PersonalizationSystem):
             best = df.loc[best_idx].copy()
             # side is already set from generation_metadata ("follow" or "avoid")
 
+        elif self.attribute_selection == "regression":
+            # Build a soft label vector per user: softmax over all (attribute, side) judge scores
+            # Hard label (argmax) is stored in labels_by_user_id for debug purposes
+            soft_labels_by_user_id = {}
+            best_rows = []
+            for user_id, group in df.groupby("user_id"):
+                score_vector = torch.zeros(len(self.attributes) * 2)
+                for _, row in group.iterrows():
+                    idx = attr_to_idx[row["attribute"]] + (len(self.attributes) if row["side"] == "follow" else 0)
+                    score_vector[idx] = row["score"]
+                soft = torch.softmax(score_vector, dim=0)
+                soft_labels_by_user_id[user_id] = soft.tolist()
+                best_rows.append({"user_id": user_id, "label": int(soft.argmax().item())})
+            best = pd.DataFrame(best_rows)
+
         elif self.attribute_selection == "margin":
             # Compute margin = follow_score - avoid_score per (user, attribute), pick highest margin
             pivoted = df.pivot_table(index=["user_id", "attribute"], columns="side", values="score").reset_index()
@@ -156,9 +171,11 @@ class AttributePersonalizationSystem(PersonalizationSystem):
             best["side"] = best["margin"].apply(lambda m: "follow" if m > 0 else "avoid")
 
         # Encode label: avoid = attr_idx, follow = attr_idx + len(attributes)
-        best["label"] = best.apply(
-            lambda row: attr_to_idx[row["attribute"]] + (len(self.attributes) if row["side"] == "follow" else 0), axis=1
-        )
+        # (regression mode pre-populates best["label"] as argmax, so skip encoding)
+        if self.attribute_selection != "regression":
+            best["label"] = best.apply(
+                lambda row: attr_to_idx[row["attribute"]] + (len(self.attributes) if row["side"] == "follow" else 0), axis=1
+            )
         labels_by_user_id = dict(zip(best["user_id"], best["label"]))
 
         # Debug: label distribution
@@ -205,10 +222,12 @@ class AttributePersonalizationSystem(PersonalizationSystem):
         labels = []
         for item in dataset:
             user_id = item.user_id
-            label = labels_by_user_id[user_id]
             text = self._format_history(item.conversation_history)
             texts.append(text)
-            labels.append(label)
+            if self.attribute_selection == "regression":
+                labels.append(soft_labels_by_user_id[user_id])
+            else:
+                labels.append(labels_by_user_id[user_id])
 
         log_gpu_usage("Before text classification model load")
         print(f"[AttributePersonalizationSystem] 2.b. Loading text classification model...")

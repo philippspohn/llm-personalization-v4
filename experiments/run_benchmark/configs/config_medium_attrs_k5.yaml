@@ -1,0 +1,38 @@
+defaults:
+  - config_medium
+  - _self_
+
+attribute_personalization_dataset:
+  dataset_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_first5_hf
+
+user_attributes:
+  - verbose
+  - enthusiastic
+  - open-ended
+  - tech-savvy
+  - highly constrained
+
+response_attributes:
+  - emotionally neutral
+  - casual
+  - elaborate
+  - acknowledges uncertainty
+  - prescriptive
+
+personalization_system:
+  attributes:
+    - emotionally neutral
+    - casual
+    - elaborate
+    - acknowledges uncertainty
+    - prescriptive
+
+persona_personalization_system:
+  attributes:
+    - emotionally neutral
+    - casual
+    - elaborate
+    - acknowledges uncertainty
+    - prescriptive
+
+output_dir: data/run_benchmark/{timestamp}_medium_attrs_k5

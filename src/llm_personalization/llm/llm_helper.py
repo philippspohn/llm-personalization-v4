@@ -34,6 +34,7 @@ class LLMHelper:
         max_model_len: int | None = None,
         enable_thinking: bool = False,
         sampling_params: dict[str, Any] | None = None,
+        vllm_kwargs: dict[str, Any] | None = None,
     ):
         self.model = model
         self.tensor_parallel_size = tensor_parallel_size
@@ -41,7 +42,8 @@ class LLMHelper:
         self.max_model_len = max_model_len
         self.enable_thinking = enable_thinking
         self.sampling_params = sampling_params or {}
-        
+        self.vllm_kwargs = vllm_kwargs or {}
+
     def load(self):
         suppress_vllm_logs()
         self.llm = LLM(
@@ -50,6 +52,7 @@ class LLMHelper:
             gpu_memory_utilization=self.gpu_memory_utilization,
             max_model_len=self.max_model_len,
             trust_remote_code=True,
+            **self.vllm_kwargs,
         )
         
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, trust_remote_code=True)

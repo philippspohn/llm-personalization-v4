@@ -13,5 +13,7 @@ judge:
     max_tokens: 4096
     temperature: 1.0
     top_p: 0.95
+  vllm_kwargs:
+    disable_custom_all_reduce: true
 
 input_path: data/judge_prompt_selection/responses_gpt-oss-120b_100_k10.csv

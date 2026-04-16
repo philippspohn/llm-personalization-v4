@@ -1,0 +1,13 @@
+_target_: llm_personalization.judge.ParsedRatingJudge
+
+model: google/gemma-4-31B-it
+tensor_parallel_size: 2
+max_model_len: 8192
+
+enable_thinking: true
+
+sampling_params:
+  max_tokens: 4096
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 64

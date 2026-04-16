@@ -6,6 +6,13 @@ gemma_27b,serious/playful,160,9.925,1.527,1.3125,-0.4182,0.0
 gemma_27b,objective/subjective,160,15.6625,2.6853,4.8875,0.1729,0.0288
 gemma_27b,structured/unstructured,160,14.725,3.0269,4.05,-0.0125,0.8753
 gemma_27b,overall,960,13.4958,3.2207,3.3,,
+gemma_4_31b,verbose/terse,160,8.7112,2.1484,2.38,-0.6651,0.0
+gemma_4_31b,formal/casual,160,11.2431,1.6654,1.2156,-0.7156,0.0
+gemma_4_31b,warm/cold,160,9.8131,2.2114,2.1369,-0.7909,0.0
+gemma_4_31b,serious/playful,160,10.2619,1.161,0.8681,-0.7399,0.0
+gemma_4_31b,objective/subjective,160,12.9588,3.5131,2.5262,-0.5351,0.0
+gemma_4_31b,structured/unstructured,160,13.4306,4.0074,3.4456,-0.5045,0.0
+gemma_4_31b,overall,960,11.0698,3.1357,2.0954,,
 glm_4_5_air,verbose/terse,160,7.8562,2.444,3.3188,-0.4128,0.0
 glm_4_5_air,formal/casual,160,10.1312,2.1364,1.8188,-0.5647,0.0
 glm_4_5_air,warm/cold,160,10.2438,2.8367,2.1562,-0.3567,0.0

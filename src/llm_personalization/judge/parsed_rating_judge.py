@@ -38,6 +38,8 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
         self.sampling_params = sampling_params or {}
         self.vllm_kwargs = vllm_kwargs or {}
         self.retries = retries
+        # Gemma 4 uses <channel|> to close thinking blocks; DeepSeek/Qwen use </think>
+        self.thinking_close_token = "<channel|>" if "gemma-4" in model.lower() else "</think>"
 
     def load(self):
         from llm_personalization.llm.llm_helper import suppress_vllm_logs
@@ -108,7 +110,7 @@ class ParsedRatingJudge(AttributeJudge, PersonaJudge):
             if self.force_rating_on_thinking_timeout and timeout_local_indices:
                 print(f"[ParsedRatingJudge] {len(timeout_local_indices)}/{len(pending_prompts)} prompts hit thinking timeout, forcing rating...")
                 retry_prompts = [
-                    pending_prompts[local_i] + outputs[local_i].outputs[0].text + "</think>\n\nRating: "
+                    pending_prompts[local_i] + outputs[local_i].outputs[0].text + f"{self.thinking_close_token}\n\nRating: "
                     for local_i in timeout_local_indices
                 ]
                 retry_outputs = self.llm.generate(retry_prompts, sampling_params=SamplingParams(**{**self.sampling_params, "max_tokens": 4}))

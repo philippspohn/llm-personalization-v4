@@ -1,0 +1,31 @@
+defaults:
+  - config_medium
+  - _self_
+
+user_attributes:
+  - verbose
+  - professional
+  - open-minded
+  - unpolished
+
+response_attributes:
+  - emotionally neutral
+  - peer-to-peer tone
+  - elaborate
+  - concrete
+
+personalization_system:
+  attributes:
+    - emotionally neutral
+    - peer-to-peer tone
+    - elaborate
+    - concrete
+
+persona_personalization_system:
+  attributes:
+    - emotionally neutral
+    - peer-to-peer tone
+    - elaborate
+    - concrete
+
+output_dir: data/run_benchmark/{timestamp}_medium_attrs_k4

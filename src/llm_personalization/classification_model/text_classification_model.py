@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 from tqdm import tqdm
 import gc
@@ -57,13 +58,15 @@ class TextClassificationModel:
                 all_preds.extend(logits.argmax(dim=-1).tolist())
         return all_preds
 
-    def train(self, texts: list[str], labels: list[int],
-              val_texts: list[str] | None = None, val_labels: list[int] | None = None,
+    def train(self, texts: list[str], labels: list[int] | list[list[float]],
+              val_texts: list[str] | None = None, val_labels: list[int] | list[list[float]] | None = None,
               batch_size: int = 8, grad_accum_steps: int = 8, epochs: int = 3, lr: float = 2e-5):
         if self.model is None:
             raise ValueError("Model not loaded")
         self.model.train()
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr)
+
+        is_soft = isinstance(labels[0], list)
 
         self._trunc_total = self._trunc_count = self._trunc_excess = 0
 
@@ -76,13 +79,19 @@ class TextClassificationModel:
             for step, i in enumerate(tqdm(range(0, len(texts), batch_size), desc=f"Epoch {epoch}")):
                 batch_indices = indices[i:i + batch_size]
                 batch_texts = [texts[j] for j in batch_indices]
-                batch_labels = torch.tensor([labels[j] for j in batch_indices], device=self.model.device)
 
                 inputs = self._tokenize(batch_texts, track_truncation=(epoch == 0))
                 inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
-                inputs["labels"] = batch_labels
 
-                loss = self.model(**inputs).loss / grad_accum_steps
+                if is_soft:
+                    batch_labels = torch.tensor([labels[j] for j in batch_indices], dtype=torch.float, device=self.model.device)
+                    logits = self.model(**inputs).logits
+                    loss = F.cross_entropy(logits, batch_labels) / grad_accum_steps
+                else:
+                    batch_labels = torch.tensor([labels[j] for j in batch_indices], device=self.model.device)
+                    inputs["labels"] = batch_labels
+                    loss = self.model(**inputs).loss / grad_accum_steps
+
                 loss.backward()
                 step_loss = loss.item() * grad_accum_steps
                 total_loss += step_loss
@@ -106,12 +115,18 @@ class TextClassificationModel:
                 with torch.no_grad():
                     val_inputs = self._tokenize(val_texts)
                     val_inputs = {k: v.to(self.model.device) for k, v in val_inputs.items()}
-                    val_inputs["labels"] = torch.tensor(val_labels, device=self.model.device)
-                    val_loss = self.model(**val_inputs).loss.item()
+                    if is_soft:
+                        val_labels_tensor = torch.tensor(val_labels, dtype=torch.float, device=self.model.device)
+                        val_loss = F.cross_entropy(self.model(**val_inputs).logits, val_labels_tensor).item()
+                        val_hard_labels = torch.tensor(val_labels).argmax(dim=-1).tolist()
+                    else:
+                        val_inputs["labels"] = torch.tensor(val_labels, device=self.model.device)
+                        val_loss = self.model(**val_inputs).loss.item()
+                        val_hard_labels = val_labels
 
                 # Validation accuracy
                 val_preds = self.predict(val_texts)
-                val_acc = sum(p == l for p, l in zip(val_preds, val_labels)) / len(val_labels)
+                val_acc = sum(p == l for p, l in zip(val_preds, val_hard_labels)) / len(val_hard_labels)
                 print(f"  Epoch {epoch}: train_loss={avg_train_loss:.4f}, val_loss={val_loss:.4f}, val_acc={val_acc:.4f}")
             else:
                 print(f"  Epoch {epoch}: train_loss={avg_train_loss:.4f}")

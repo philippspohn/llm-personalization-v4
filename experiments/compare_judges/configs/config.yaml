@@ -13,7 +13,8 @@ defaults:
   # - judges@judge_configs.qwen3_5_35ba3b: local_qwen3_5_35ba3b
   # - judges@judge_configs.gpt_oss_120b_2: local_gpt-oss-120b
   # - judges@judge_configs.gpt_oss_20b: local_gpt-oss-20b
-  - judges@judge_configs.nemotron_3_super: local_nemotron-3-super
+  # - judges@judge_configs.nemotron_3_super: local_nemotron-3-super
+  - judges@judge_configs.gemma_4_31b: local_gemma-4-31b
   - _self_
 
 limit: 960

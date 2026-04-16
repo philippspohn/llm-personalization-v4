@@ -1,0 +1,39 @@
+defaults:
+  - attributes
+  - _self_
+
+input_path: data/judge_prompt_selection/responses_gpt-oss-120b_100_k10.csv
+output_dir: data/judge_prompt_selection/evolutionary_search/{timestamp}
+
+seed: 42         # RNG seed for parent selection
+eval_seed: 0     # Seed for the fixed eval set (kept constant across all batches)
+
+num_eval_prompts: 10     # Number of (prompt, gt_attr) pairs per evaluation
+num_iterations: 20       # Number of mutation+evaluation batches
+batch_size: 5            # Mutations generated per batch
+
+max_pool_size: 10        # Maximum number of candidate prompts to keep
+similarity_threshold: 0.5  # Jaccard similarity above which two prompts are "too similar"
+selection_temperature: 1.0  # Softmax temperature for parent selection (higher = more uniform)
+
+judge:
+  _target_: llm_personalization.judge.ParsedRatingJudge
+  model: openai/gpt-oss-120b
+  tensor_parallel_size: 2
+  max_model_len: 32768
+  gpu_memory_utilization: 0.85
+  enable_thinking: true
+  force_rating_on_thinking_timeout: true
+  sampling_params:
+    max_tokens: 4096
+    temperature: 1.0
+    top_p: 0.95
+  vllm_kwargs:
+    disable_custom_all_reduce: true
+
+# Mutation uses judge.llm directly (same loaded model, no extra loading).
+# These params override the judge's sampling_params for mutation calls only.
+mutator_sampling_params:
+  max_tokens: 1024
+  temperature: 1.0
+  top_p: 0.95
