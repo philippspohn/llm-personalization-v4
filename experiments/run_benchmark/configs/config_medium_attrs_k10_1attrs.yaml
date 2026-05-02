@@ -1,0 +1,50 @@
+defaults:
+  - config_medium
+  - _self_
+
+attribute_personalization_dataset:
+  dataset_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_hf
+  train_limit: 4000
+  test_limit: 1000
+
+user_attributes:
+  - verbose
+  - enthusiastic
+  - open-ended
+  - tech-savvy
+  - highly constrained
+  - anxious
+  - transactional
+  - hypothetical
+  - unpolished
+  - prescriptive
+
+response_attributes:
+  - emotionally neutral
+  - casual
+  - elaborate
+  - acknowledges uncertainty
+  - prescriptive
+  - assumes no prior knowledge
+  - gentle
+  - persuasive
+  - presents multiple perspectives
+  - collaborative
+
+personalization_system:
+  attributes:
+    - emotionally neutral
+    - casual
+    - elaborate
+    - acknowledges uncertainty
+    - prescriptive
+    - assumes no prior knowledge
+    - gentle
+    - persuasive
+    - presents multiple perspectives
+    - collaborative
+
+persona_personalization_dataset: null
+robustness: null
+
+output_dir: data/run_benchmark/{timestamp}_medium_attrs_k10_1attrs

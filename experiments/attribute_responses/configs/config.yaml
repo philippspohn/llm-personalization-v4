@@ -1,0 +1,42 @@
+defaults:
+  - llm: nemotron
+  - attributes: k10
+  - _self_
+
+# Path to the synthetic-conversations JSONL file (raw, not HF). Each line is one
+# user record produced by `generate_conversations_chunked.py`.
+input_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_train.jsonl
+
+# Logical name of the split being processed. Used only for the output filename.
+split_name: train
+
+# Output directory. Per-task JSONL files are written as
+#   <output_dir>/<split_name>_part<task_id>_of<task_count>.jsonl
+# so concatenating all parts yields the merged file.
+output_dir: data/attribute_responses/gpt-oss-120b_k10_1attrs_nemotron
+
+# Response-style attributes are loaded via the `attributes` hydra config group
+# (see configs/attributes/{k2,k4,k6,k8,k10}.yaml). Default = k10. Override
+# from the CLI with e.g. `attributes=k4`.
+
+# Which side of every attribute to probe. With both follow and avoid we get
+# 2*len(attributes) responses per prompt (20 for k=10), matching the
+# `attribute_selection: margin` / `abs_two_sided` / `regression` branches of
+# the AttributePersonalizationSystem.
+sides:
+  - follow
+  - avoid
+
+# Array slicing. By default we read SLURM_ARRAY_TASK_ID / SLURM_ARRAY_TASK_COUNT
+# from the environment; CLI overrides win. For non-array runs leave as 0/1.
+array_task_id: ${oc.env:SLURM_ARRAY_TASK_ID,0}
+array_task_count: ${oc.env:SLURM_ARRAY_TASK_COUNT,1}
+
+# Optional cap on the number of users from the input file *before* array
+# slicing. Use this to limit the total pool (e.g. only generate for the first
+# 9k of 16k train users). Set to null to use the whole file.
+input_limit: null
+
+# Optional cap on the number of users *after* array slicing. Useful for
+# smoke tests on a single task.
+limit: null

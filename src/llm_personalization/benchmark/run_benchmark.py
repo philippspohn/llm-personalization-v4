@@ -20,19 +20,42 @@ import json
 from llm_personalization.utils.gpu_monitor import log_gpu_usage
 from llm_personalization.llm.llm_helper import LLMHelper
 
-def _generate_world_matrix(type: Literal["permutation", "dense"], shape: tuple[int, int], seed: int = 42) -> torch.Tensor:
+def _generate_world_matrix(
+    type: Literal["permutation", "dense"],
+    shape: tuple[int, int],
+    seed: int = 42,
+    k: int = 1,
+) -> torch.Tensor:
+    """Sample a world (mapping) matrix.
+
+    `permutation`: stacks `k` pairwise-elementwise-distinct signed permutations.
+        For k=1 this is the original signed permutation (1 nonzero per row and
+        per column). For k>=2 each row and each column has exactly k nonzeros
+        in {-1, +1} (a k-regular signed bipartite graph). When `u` is one-hot
+        at index j, `M @ u` then activates exactly `k` distinct response
+        indices (those with nonzero entries in column j).
+
+    `dense`: i.i.d. standard-normal entries (k is ignored).
+    """
     rng = torch.Generator().manual_seed(seed)
 
     if type == "permutation":
         if shape[0] != shape[1]:
             raise ValueError(f"Permutation matrix must be square, got shape {shape}")
         n = shape[0]
-        perm = torch.randperm(n, generator=rng)
+        if k < 1 or k > n:
+            raise ValueError(f"permutation k must satisfy 1 <= k <= n; got k={k}, n={n}")
+        # Sample k permutations such that for every column they all disagree
+        # (=> each column has exactly k distinct nonzero rows).
+        perms: list[torch.Tensor] = []
+        while len(perms) < k:
+            cand = torch.randperm(n, generator=rng)
+            if all(bool((cand != p).all().item()) for p in perms):
+                perms.append(cand)
         matrix = torch.zeros(n, n)
-        matrix[torch.arange(n), perm] = 1.0
-        # Randomly flip signs
-        signs = torch.randint(0, 2, (n,), generator=rng) * 2 - 1  # -1 or +1
-        matrix[torch.arange(n), perm] = signs.float()
+        for p in perms:
+            signs = torch.randint(0, 2, (n,), generator=rng) * 2 - 1
+            matrix[torch.arange(n), p] = signs.float()
         return matrix
 
     elif type == "dense":
@@ -66,6 +89,12 @@ def _response_attribute_vector_to_attributes(response_attribute_vector: torch.Te
             attributes.append({"attribute": available_response_attributes[i], "side": "follow" if response_attribute_vector[i] > 0 else "avoid"})
     return attributes
 
+def _save_jsonl(path: Path, records: list[dict]) -> None:
+    with open(path, "w") as f:
+        for r in records:
+            f.write(json.dumps(r) + "\n")
+    print(f"[Benchmark]    Saved {len(records)} test samples to {path}")
+
 def _plot_score_distribution(scores: torch.Tensor, unpersonalized_scores: torch.Tensor, output_dir: Path, world_idx: int | str):
     plt.figure(figsize=(10, 5))
     bins = np.arange(-10, 11, 1)
@@ -91,7 +120,17 @@ def run_benchmark(
     output_dir_results.mkdir(parents=True, exist_ok=True)
     num_worlds = benchmark_config.num_worlds
     world_matrix_type = benchmark_config.world_matrix_type
+    world_matrix_k: int = int(benchmark_config.get("world_matrix_k", 1))
+    # Optional explicit list of world seeds. If provided, overrides `num_worlds`
+    # and lets you run e.g. a single seed per slurm-array task. Each seed is
+    # used both as the world-matrix seed and as the world's directory name.
+    world_seeds_cfg = benchmark_config.get("world_seeds", None)
+    if world_seeds_cfg is not None:
+        world_seeds: list[int] = [int(s) for s in world_seeds_cfg]
+    else:
+        world_seeds = list(range(num_worlds))
     skip_training = benchmark_config.get("skip_training", False)
+    save_test_results = benchmark_config.get("save_test_results", False)
     results = {"timestamp": timestamp}
 
     user_attributes = list(benchmark_config.user_attributes)
@@ -111,9 +150,9 @@ def run_benchmark(
     attribute_judge: AttributeJudge = hydra.utils.instantiate(benchmark_config.attribute_judge)
     unpersonalized_llm_helper: LLMHelper = hydra.utils.instantiate(benchmark_config.unpersonalized_llm_helper)
 
-    for world_idx in range(num_worlds):
+    for world_idx in world_seeds:
         print(f"[Benchmark]    Evaluating world {world_idx}...")
-        world_matrix = _generate_world_matrix(world_matrix_type, (len(user_attributes), len(response_attributes)), seed=world_idx)
+        world_matrix = _generate_world_matrix(world_matrix_type, (len(user_attributes), len(response_attributes)), seed=world_idx, k=world_matrix_k)
         out_world_path = output_dir_trained_system / f"world_{world_idx}"
         out_world_path.mkdir(parents=True, exist_ok=True)
 
@@ -206,6 +245,24 @@ def run_benchmark(
         }
 
         _plot_score_distribution(scores, unpersonalized_scores, output_dir_results, world_idx)
+
+        if save_test_results:
+            records = []
+            for i in range(len(test_dataset)):
+                labeled_item = test_labeled_dataset[i]
+                item = test_dataset[i]
+                records.append({
+                    "user_id": item.user_id,
+                    "conversation_history": item.conversation_history,
+                    "current_messages": item.current_messages,
+                    "gt_user_attributes": labeled_item.user_attributes,
+                    "assigned_response_attributes": test_id_to_attributes[item.user_id],
+                    "personalized_response": responses[i],
+                    "unpersonalized_response": unpersonalized_responses[i].content,
+                    "personalized_score": scores[i].item(),
+                    "unpersonalized_score": unpersonalized_scores[i].item(),
+                })
+            _save_jsonl(output_dir_results / f"attribute_world_{world_idx}_test_samples.jsonl", records)
     # Persona Personalization Benchmark
     if benchmark_config.get("persona_personalization_dataset") is not None:
         print(f"[Benchmark] (2/3) Persona Personalization Benchmark")
@@ -297,6 +354,24 @@ def run_benchmark(
 
         _plot_score_distribution(persona_scores, persona_unpersonalized_scores, output_dir_results, world_idx="persona")
 
+        if save_test_results:
+            records = []
+            for i in range(len(persona_test_dataset)):
+                labeled_item = persona_test_labeled[i]
+                item = persona_test_dataset[i]
+                records.append({
+                    "user_id": item.user_id,
+                    "conversation_history": item.conversation_history,
+                    "current_messages": item.current_messages,
+                    "persona": labeled_item.persona,
+                    "formatted_persona": labeled_item.formatted_persona,
+                    "personalized_response": persona_responses[i],
+                    "unpersonalized_response": unpersonalized_persona_responses[i].content,
+                    "personalized_score": persona_scores[i].item(),
+                    "unpersonalized_score": persona_unpersonalized_scores[i].item(),
+                })
+            _save_jsonl(output_dir_results / "persona_test_samples.jsonl", records)
+
     # Robustness Benchmark
     robustness_config = benchmark_config.get("robustness")
     if robustness_config is not None:
@@ -319,7 +394,7 @@ def run_benchmark(
         # Attribute personalization system (use last world)
         if test_dataset is not None:
             attr_robustness_dataset = RobustnessDataset(test_dataset, robustness_questions)
-            last_world_path = output_dir_trained_system / f"world_{num_worlds - 1}"
+            last_world_path = output_dir_trained_system / f"world_{world_seeds[-1]}"
             robustness_systems.append(("attribute", personalization_system, last_world_path, attr_robustness_dataset))
 
         # Persona personalization system
@@ -345,6 +420,21 @@ def run_benchmark(
             unpersonalized_total[q.source] += 1
             if parsed == q.correct_letter:
                 unpersonalized_correct[q.source] += 1
+
+        if save_test_results:
+            records = []
+            for q, resp in zip(robustness_questions, unpersonalized_robustness_responses):
+                records.append({
+                    "question_id": q.question_id,
+                    "source": q.source,
+                    "question_text": q.question_text,
+                    "options": q.options,
+                    "option_letters": q.option_letters,
+                    "correct_letter": q.correct_letter,
+                    "response": resp.content,
+                    "parsed_letter": parse_answer_letter(resp.content),
+                })
+            _save_jsonl(output_dir_results / "robustness_unpersonalized_test_samples.jsonl", records)
 
         robustness_results = {"unpersonalized": {}}
         print(f"[Benchmark]    Unpersonalized robustness results:")
@@ -373,6 +463,25 @@ def run_benchmark(
                 total[q.source] += 1
                 if parsed == q.correct_letter:
                     correct[q.source] += 1
+
+            if save_test_results:
+                records = []
+                for i, resp in enumerate(robustness_responses):
+                    q = robustness_dataset.get_question(i)
+                    item = robustness_dataset[i]
+                    records.append({
+                        "user_id": item.user_id,
+                        "conversation_history": item.conversation_history,
+                        "question_id": q.question_id,
+                        "source": q.source,
+                        "question_text": q.question_text,
+                        "options": q.options,
+                        "option_letters": q.option_letters,
+                        "correct_letter": q.correct_letter,
+                        "response": resp,
+                        "parsed_letter": parse_answer_letter(resp),
+                    })
+                _save_jsonl(output_dir_results / f"robustness_{system_name}_test_samples.jsonl", records)
 
             robustness_results[system_name] = {}
             print(f"[Benchmark]    Robustness results for {system_name} system:")

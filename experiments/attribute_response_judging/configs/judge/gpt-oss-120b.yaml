@@ -1,0 +1,26 @@
+_target_: llm_personalization.judge.parsed_rating_judge.ParsedRatingJudge
+
+model: openai/gpt-oss-120b
+
+tensor_parallel_size: 1
+max_model_len: 32768
+# Memory tuning (TP=1, gpt-oss-120b MXFP4 on H100 80GB):
+# - Load-time OOM in `_swizzle_mxfp4` is fixed by
+#   `PYTORCH_ALLOC_CONF=expandable_segments:True` (set in the sbatch) and by
+#   `max_num_batched_tokens=1024` (shrinks the activation profile that
+#   competes with the swizzle scratch).
+# - Steady-state long-tail OOM in the sampler (e.g. `apply_top_k_top_p`'s
+#   softmax) was hitting us at GMU=0.95 with ~7 of 68800 prompts running their
+#   thinking traces to `max_tokens`. GMU=0.90 doubles the post-load headroom
+#   (~8 GiB vs ~4 GiB) at the cost of a slightly smaller KV cache (which is
+#   not the bottleneck for short judge prompts).
+gpu_memory_utilization: 0.90
+enable_thinking: true
+
+vllm_kwargs:
+  max_num_batched_tokens: 1024
+
+sampling_params:
+  max_tokens: 4096
+  temperature: 1.0
+  top_p: 0.95

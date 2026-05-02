@@ -1,0 +1,9 @@
+defaults:
+  - config_medium_attrs_k10_1attrs
+  - _self_
+
+# Variant: dense world matrix, 2 response attributes per user (top-2 by |C @ u|).
+world_matrix_type: dense
+num_response_attributes_per_user: 2
+
+output_dir: data/run_benchmark/{timestamp}_attrs_k10_dense_n2

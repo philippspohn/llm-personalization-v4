@@ -1,0 +1,13 @@
+_target_: llm_personalization.llm.llm_helper.LLMHelper
+
+model: Qwen/Qwen3.5-27B
+
+tensor_parallel_size: 2
+max_model_len: 16384
+gpu_memory_utilization: 0.90
+enable_thinking: false
+
+sampling_params:
+  max_tokens: 1024
+  temperature: 0.7
+  top_p: 0.9

@@ -1,0 +1,16 @@
+defaults:
+  - llm@llm_configs.qwen_small: qwen3.5-0.8b
+  - llm@llm_configs.qwen_large: qwen3.5-27b
+  - _self_
+
+num_prompts: 100
+seed: 42
+output_dir: data/persona_judge_bias_v2
+responses_filename: responses.jsonl
+
+k10_attributes_path: data/attribute_selection/response_attributes/response_attributes_k10.yaml
+system_prompts_path: experiments/persona_judge_bias_v2/configs/system_prompts.yaml
+
+hydra:
+  run:
+    dir: ${output_dir}/hydra/generate_${now:%Y-%m-%d_%H-%M-%S}

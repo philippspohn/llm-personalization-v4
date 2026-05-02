@@ -1,0 +1,23 @@
+defaults:
+  - judge@judge: gpt-oss-120b
+  - _self_
+
+seed: 42
+output_dir: data/persona_judge_bias_v2
+responses_filename: responses.jsonl
+scores_filename: judge_scores.jsonl
+summary_filename: summary.csv
+
+# Grounding for attribute-grounded personalization judgment:
+# how many random attributes from k10 to use as the "user preference profile".
+num_grounding_attributes: 3
+
+# Grounding for persona-grounded personalization judgment.
+num_personas: 100  # one per prompt
+persona_split: "train"
+
+k10_attributes_path: data/attribute_selection/response_attributes/response_attributes_k10.yaml
+
+hydra:
+  run:
+    dir: ${output_dir}/hydra/judge_${now:%Y-%m-%d_%H-%M-%S}

@@ -3,6 +3,7 @@ torch
 transformers
 accelerate
 datasets==4.6.1
+peft
 
 # Inference
 vllm>=0.18.0

@@ -1,0 +1,40 @@
+defaults:
+  - judge: gpt-oss-120b
+  - _self_
+
+# Inputs are JSONL files produced by `experiments/attribute_responses`.
+# Each entry is `{path, split_name}`; users from each file are tagged with
+# `split_name` in the output and concatenated in the order given before being
+# sliced across array tasks.
+inputs:
+  - path: data/attribute_responses/gpt-oss-120b_k10_1attrs_nemotron/train_4500.jsonl
+    split_name: train
+  - path: data/attribute_responses/gpt-oss-120b_k10_1attrs_nemotron/test.jsonl
+    split_name: test
+
+output_dir: data/attribute_response_judging/gpt-oss-120b_k10_1attrs_nemotron_gptoss_judge
+
+# The attributes the judge rates each response on. Must match the response
+# attributes used in `experiments/attribute_responses` and in the
+# AttributePersonalizationSystem's `attributes` field
+# (config_medium.yaml -> response_attributes / personalization_system.attributes).
+# We score each response on each of these attribute *names* and store the
+# raw 1-10 scores. Avoid-side targets can be derived as `11 - score` downstream.
+attributes:
+  - emotionally neutral
+  - casual
+  - elaborate
+  - acknowledges uncertainty
+  - prescriptive
+  - assumes no prior knowledge
+  - gentle
+  - persuasive
+  - presents multiple perspectives
+  - collaborative
+
+# Array slicing.
+array_task_id: ${oc.env:SLURM_ARRAY_TASK_ID,0}
+array_task_count: ${oc.env:SLURM_ARRAY_TASK_COUNT,1}
+
+# Optional cap on number of users (after slicing). Useful for smoke tests.
+limit: null

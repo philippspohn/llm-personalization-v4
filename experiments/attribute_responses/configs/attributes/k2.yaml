@@ -1,0 +1,7 @@
+# @package _global_
+# Mirrors data/attribute_selection/response_attributes/response_attributes_k2.yaml
+# and the `response_attributes` block of
+# experiments/run_benchmark/configs/config_medium_attrs_k2_1attrs.yaml.
+attributes:
+  - emotionally neutral
+  - teacher-to-student tone

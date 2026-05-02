@@ -1,0 +1,12 @@
+defaults:
+  - config_medium_attrs_k10_1attrs
+  - _self_
+
+# Variant: signed permutation matrix with k=2 nonzeros per row and column.
+# When the user has 1 attribute (one-hot u), C @ u activates exactly 2
+# distinct response attributes (each with a random ±1 sign).
+world_matrix_type: permutation
+world_matrix_k: 2
+num_response_attributes_per_user: 2
+
+output_dir: data/run_benchmark/{timestamp}_attrs_k10_perm_n2
