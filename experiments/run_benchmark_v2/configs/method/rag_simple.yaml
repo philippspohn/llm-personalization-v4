@@ -1,0 +1,10 @@
+# Simple RAG: BGE-M3 history embeddings + top-3 retrieval + in-context
+# (preferred, disliked) examples in the system prompt.
+
+_target_: llm_personalization.personalization_system_v2.methods.rag_simple.RAGSimple
+llm: ${llm}
+embedding_model: BAAI/bge-m3
+embedding_max_length: 1024
+embedding_batch_size: 32
+max_chars_per_msg: 1024
+k: 3

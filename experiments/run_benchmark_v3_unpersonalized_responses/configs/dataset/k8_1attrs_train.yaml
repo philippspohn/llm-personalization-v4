@@ -1,0 +1,4 @@
+# @package _global_
+pool_tag: k8_1attrs
+split_name: train
+input_path: data/attribute_responses/gpt-oss-120b_k8_1attrs_nemotron/train.jsonl

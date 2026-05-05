@@ -1,0 +1,54 @@
+input_path: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_train.jsonl
+
+# Optional cap on number of samples (= first user prompts) after loading.
+# Sampled stratified-uniform across (attribute, side) when set.
+sample_limit: null
+seed: 0
+output_dir: data/language_analysis
+
+# One sample = the first user prompt of each conversation. No assistant
+# text, no follow-up turns.
+
+# n-gram sizes to compute (each computed independently).
+ngram_sizes: [1, 2]
+
+# Lowercase, strip non-alphanumeric, drop tokens shorter than this.
+min_token_len: 2
+
+# Drop n-grams appearing in fewer than this many samples (across the whole
+# dataset) before scoring — kills noise from rare tokens.
+# Light threshold — only kills typos / rare proper nouns. The log-odds
+# z-score's variance term handles statistical reliability of rare words on
+# its own, so this should NOT be set high.
+min_doc_freq: 5
+
+# How many top n-grams to dump per comparison and per direction.
+top_k: 50
+
+# When writing the .top.txt summaries, only show n-grams whose log-odds
+# |z| exceeds this threshold (≈ p<0.05 at 1.96, p<0.001 at 3.29). The
+# .full.csv always contains every n-gram.
+display_min_abs_z: 1.96
+
+# Prior strength for log-odds Dirichlet. Monroe et al. recommend the
+# combined corpus frequencies; alpha scales how informative that prior is.
+log_odds_alpha: 0.01
+
+# Comparisons to run.
+# - follow_vs_avoid: per attribute, follow-side users vs avoid-side users.
+# - attribute_vs_others: each attribute vs all other attributes, restricted
+#   to the side below.
+comparisons:
+  # Per attribute, follow-side prompts vs avoid-side prompts of THAT attribute.
+  follow_vs_avoid: true
+
+  # Per attribute and side, prompts in (attr, side) vs prompts of all other
+  # attributes on the SAME side only.
+  attribute_vs_others: true
+  attribute_vs_others_side: both  # follow | avoid | both
+
+  # Per attribute and side, prompts in (attr, side) vs prompts of all OTHER
+  # attributes (both follow and avoid mixed). Distinguishes a single endpoint
+  # of one axis from the rest of the dataset, marginalising over other users'
+  # axis positions.
+  attribute_vs_general: true

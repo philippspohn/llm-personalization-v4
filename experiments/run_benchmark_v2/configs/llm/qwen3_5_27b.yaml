@@ -1,0 +1,22 @@
+# Qwen/Qwen3.5-27B for v2 personalized generation.
+#
+# Sizing: ~54 GB weights in BF16. TP=2 on H100 80GB leaves ~25 GB headroom
+# per rank for KV cache + activations + CUDA graphs at max_model_len=16384.
+# (TP=1 also fits but leaves no room for long contexts; TP=4 is wasteful.)
+#
+# `disable_custom_all_reduce: true` matches the Llama config -- defensive
+# against the `custom_all_reduce.cuh:455 'invalid argument'` failure we hit
+# in earlier v2 runs. Falls back to the NCCL all-reduce path.
+
+_target_: llm_personalization.llm.llm_helper.LLMHelper
+model: Qwen/Qwen3.5-27B
+tensor_parallel_size: 2
+gpu_memory_utilization: 0.90
+max_model_len: 16384
+enable_thinking: false
+sampling_params:
+  max_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95
+vllm_kwargs:
+  disable_custom_all_reduce: true

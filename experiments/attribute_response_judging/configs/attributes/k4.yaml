@@ -1,0 +1,7 @@
+# @package _global_
+# Mirrors data/attribute_selection/response_attributes/response_attributes_k4.yaml.
+attributes:
+  - emotionally neutral
+  - peer-to-peer tone
+  - elaborate
+  - concrete

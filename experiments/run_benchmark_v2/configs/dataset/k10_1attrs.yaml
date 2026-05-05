@@ -1,0 +1,25 @@
+# Materialised v2 benchmark dataset for the (k=10, 1 user attribute,
+# Nemotron-generated, gpt-oss-judged) cell.
+#
+# Paths are relative to the repo root. `prepare_dataset.py` reads the three
+# upstream artifacts and writes the join to `materialized_dir/{train,test}.jsonl`
+# (idempotent; downstream scripts read only from `materialized_dir`).
+
+name: gpt-oss-120b_k10_1attrs_nemotron_gptoss_judge
+
+attributes_group: k10                  # which response-attribute set was used
+sides: [follow, avoid]
+train_input_limit: 9000                # matches the cap used during candidate generation
+
+source:
+  synthetic_conversations:
+    train: data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_train.jsonl
+    test:  data/synthetic_conversations/gpt-oss-120b_k10_1attrs_16000_1000_test.jsonl
+  attribute_responses:
+    train: data/attribute_responses/gpt-oss-120b_k10_1attrs_nemotron/train.jsonl
+    test:  data/attribute_responses/gpt-oss-120b_k10_1attrs_nemotron/test.jsonl
+  attribute_response_judging:
+    dir:   data/attribute_response_judging/gpt-oss-120b_k10_1attrs_nemotron_gptoss_judge
+    glob:  ratings_part*.jsonl
+
+materialized_dir: data/benchmark_v2/gpt-oss-120b_k10_1attrs_nemotron_gptoss_judge

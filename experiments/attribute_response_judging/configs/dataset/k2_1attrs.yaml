@@ -1,0 +1,8 @@
+# @package _global_
+inputs:
+  - path: data/attribute_responses/gpt-oss-120b_k2_1attrs_nemotron/train.jsonl
+    split_name: train
+  - path: data/attribute_responses/gpt-oss-120b_k2_1attrs_nemotron/test.jsonl
+    split_name: test
+
+output_dir: data/attribute_response_judging/gpt-oss-120b_k2_1attrs_nemotron_gptoss_judge

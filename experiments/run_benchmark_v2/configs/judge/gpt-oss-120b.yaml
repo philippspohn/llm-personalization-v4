@@ -1,0 +1,17 @@
+# Same judge as in experiments/attribute_response_judging/configs/judge/gpt-oss-120b.yaml.
+# Stays at TP=1 (we ran into OOM with TP=2 on H100 80GB during MXFP4 swizzle).
+
+_target_: llm_personalization.judge.parsed_rating_judge.ParsedRatingJudge
+model: openai/gpt-oss-120b
+tensor_parallel_size: 1
+gpu_memory_utilization: 0.90
+max_model_len: 32768
+enable_thinking: true
+force_rating_on_thinking_timeout: true
+sampling_params:
+  max_tokens: 4096
+  temperature: 1.0
+  top_p: 0.95
+vllm_kwargs:
+  max_num_batched_tokens: 1024
+retries: 3

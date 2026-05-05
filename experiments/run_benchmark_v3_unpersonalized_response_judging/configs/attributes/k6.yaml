@@ -1,0 +1,9 @@
+# @package _global_
+# Mirrors data/attribute_selection/response_attributes/response_attributes_k6.yaml.
+attributes:
+  - emotionally neutral
+  - conversational
+  - elaborate
+  - acknowledges uncertainty
+  - prescriptive
+  - concrete

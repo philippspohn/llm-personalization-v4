@@ -1,0 +1,20 @@
+# Trained routing with soft regression labels: for each train user, the
+# label is the softmax of the cached 2K rating vector against the user's
+# GT axis. Argmax of predictions is used at test time.
+
+_target_: llm_personalization.personalization_system_v2.methods.routing.TrainedRouting
+llm: ${llm}
+attributes: ${attributes}
+label_mode: regression
+text_classification_model:
+  base_model: answerdotai/ModernBERT-base
+  pooling: mean
+  max_length: 4096
+  dtype: bfloat16
+train_kwargs:
+  batch_size: 4
+  grad_accum_steps: 8
+  epochs: 3
+  lr: 2.0e-5
+predict_batch_size: 16
+max_chars_per_msg: 1024

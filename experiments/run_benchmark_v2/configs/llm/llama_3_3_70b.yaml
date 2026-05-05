@@ -1,0 +1,22 @@
+# meta-llama/Llama-3.3-70B-Instruct in BF16.
+#
+# Sizing: ~140 GB weights, so we need at least TP=4 on 80 GB H100s
+# (each rank holds ~35 GB of weights and ~5-15 GB of KV / activations / CUDA
+# graphs). Pair with `--gres=gpu:4` in the sbatch.
+#
+# `disable_custom_all_reduce: true` is a defensive setting against the
+# `custom_all_reduce.cuh:455 'invalid argument'` failure we hit in earlier
+# v2 runs; vLLM's NCCL all-reduce path is fine and only marginally slower.
+
+_target_: llm_personalization.llm.llm_helper.LLMHelper
+model: meta-llama/Llama-3.3-70B-Instruct
+tensor_parallel_size: 4
+gpu_memory_utilization: 0.90
+max_model_len: 16384
+enable_thinking: false
+sampling_params:
+  max_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95
+vllm_kwargs:
+  disable_custom_all_reduce: true

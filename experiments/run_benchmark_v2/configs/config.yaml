@@ -1,0 +1,33 @@
+defaults:
+  - dataset: k10_1attrs
+  - attributes: k10                # response-attribute set; matches the dataset
+  - method: oracle_routing
+  - judge: gpt-oss-120b
+  - llm: qwen3_5_27b
+  - _self_
+
+# Where per-run artifacts (generated responses, scored results, summary)
+# get written. `{method}` and `{dataset}` are substituted with the names of
+# the selected groups; `{timestamp}` is replaced at runtime.
+output_dir: outputs/benchmark_v2/{dataset_name}/{method_name}/{timestamp}
+
+# Optional cap on number of test users (smoke testing).
+test_limit: null
+
+# How many *rated* train users to feed to method.fit. The current k10_1attrs
+# cache has 4500 train users with full ratings; capping at 4000 leaves a
+# fixed 500 user holdout we can later use for validation / hyper-param
+# sweeps without leaking the fit set. Set to null for "use all rated".
+fit_train_limit: 4000
+
+# Set to false to skip the unpersonalized baseline pass (useful when you
+# already have it cached on disk for this dataset).
+run_baseline: true
+
+# Set to false to skip the judging pass (useful for resuming after generation
+# has finished but judging needs reruns / different config).
+run_judge: true
+
+# `prepare_dataset.py` must have been run beforehand. If False here we skip
+# the explicit safety check (cheaper if you know the dataset is materialized).
+require_materialized: true

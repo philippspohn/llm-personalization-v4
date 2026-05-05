@@ -1,0 +1,11 @@
+# @package _global_
+# Mirrors data/attribute_selection/response_attributes/response_attributes_k8.yaml.
+attributes:
+  - emotionally neutral
+  - conversational
+  - verbose
+  - acknowledges uncertainty
+  - prescriptive
+  - concrete
+  - calming
+  - persuasive

@@ -1,0 +1,15 @@
+# Same model + sampling params used to generate the cached candidate responses
+# (see experiments/attribute_responses/configs/llm/nemotron.yaml). The default
+# tensor_parallel_size is set for a 2-GPU sbatch job; override on the CLI for
+# different layouts.
+
+_target_: llm_personalization.llm.llm_helper.LLMHelper
+model: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
+tensor_parallel_size: 2
+gpu_memory_utilization: 0.90
+max_model_len: 32768
+enable_thinking: false
+sampling_params:
+  max_tokens: 2048
+  temperature: 1.0
+  top_p: 0.95

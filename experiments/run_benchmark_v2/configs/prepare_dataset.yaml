@@ -1,0 +1,7 @@
+defaults:
+  - dataset: k10_1attrs
+  - attributes: k10
+  - _self_
+
+# Set to True to overwrite an existing materialized JSONL.
+force: false

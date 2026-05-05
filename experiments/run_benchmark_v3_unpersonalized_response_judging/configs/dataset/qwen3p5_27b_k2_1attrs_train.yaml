@@ -1,0 +1,5 @@
+# @package _global_
+gen_model_tag: qwen3p5_27b
+pool_tag: k2_1attrs
+split_name: train
+input_path: data/unpersonalized_responses/qwen3p5_27b/k2_1attrs_train

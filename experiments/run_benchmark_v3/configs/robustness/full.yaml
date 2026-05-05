@@ -1,0 +1,12 @@
+# @package _global_
+# Full robustness benchmark — no per-source caps. Add via `+robustness=full`
+# at submit time, only for the seed-0 job in a multi-seed sweep.
+robustness:
+  include_mmlu_pro: true
+  include_truthfulqa: true
+  include_bbq: true
+  mmlu_pro_limit: null
+  truthfulqa_limit: null
+  bbq_limit: null
+  seed: 42
+  system_name: ${method_name}

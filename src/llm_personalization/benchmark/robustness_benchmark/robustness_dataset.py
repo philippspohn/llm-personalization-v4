@@ -5,9 +5,25 @@ import re
 import string
 
 
-BBQ_AGE_TEST_PARQUET_URL = (
+# `heegyu/bbq` ships as a script-based dataset which `datasets>=4` no longer
+# supports. We instead load the auto-converted parquet snapshots HF hosts at
+# `refs/convert/parquet`, one file per category.
+BBQ_CATEGORIES = (
+    "Age",
+    "Disability_status",
+    "Gender_identity",
+    "Nationality",
+    "Physical_appearance",
+    "Race_ethnicity",
+    "Religion",
+    "SES",
+    "Sexual_orientation",
+    "Race_x_gender",
+    "Race_x_SES",
+)
+BBQ_PARQUET_URL_TMPL = (
     "hf://datasets/heegyu/bbq@refs%2Fconvert%2Fparquet/"
-    "Age/test/0000.parquet"
+    "{category}/test/0000.parquet"
 )
 
 
@@ -67,14 +83,16 @@ def load_robustness_questions(
             ))
 
     if include_bbq:
-        # Load the Parquet-converted Age/test subset directly because the
-        # original dataset script is no longer supported by `datasets>=4`.
-        ds = load_dataset(
-            "parquet",
-            data_files={"test": BBQ_AGE_TEST_PARQUET_URL},
-            split="test",
-        )
-        # Only use disambiguated examples (unambiguous correct answer)
+        # Load every BBQ category's parquet, filter to disambiguated rows,
+        # concatenate, then shuffle+limit. Sample-weighted aggregation
+        # (correct/total) downstream gives bigger categories more weight.
+        bbq_files = {
+            cat: BBQ_PARQUET_URL_TMPL.format(category=cat) for cat in BBQ_CATEGORIES
+        }
+        ds = load_dataset("parquet", data_files=bbq_files, split=None)
+        # `data_files` as a dict yields a DatasetDict keyed by category; concat them.
+        from datasets import concatenate_datasets
+        ds = concatenate_datasets([ds[cat] for cat in BBQ_CATEGORIES])
         ds = ds.filter(lambda row: row["context_condition"] == "disambig")
         if bbq_limit is not None:
             ds = ds.shuffle(seed=seed).select(range(min(bbq_limit, len(ds))))
@@ -83,7 +101,7 @@ def load_robustness_questions(
             option_letters = ["A", "B", "C"]
             correct_letter = option_letters[row["label"]]
             questions.append(RobustnessQuestion(
-                question_id=f"bbq_{row['example_id']}",
+                question_id=f"bbq_{row['category']}_{row['example_id']}",
                 question_text=f"{row['context']}\n{row['question']}",
                 options=options,
                 option_letters=option_letters,

@@ -1,0 +1,4 @@
+# @package _global_
+pool_tag: k6_2attrs
+split_name: train
+input_path: data/attribute_responses/gpt-oss-120b_k6_2attrs_nemotron/train.jsonl

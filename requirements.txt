@@ -23,3 +23,4 @@ scipy
 factor_analyzer
 seaborn
 umap-learn
+sentence-transformers

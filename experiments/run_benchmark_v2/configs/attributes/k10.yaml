@@ -1,0 +1,14 @@
+# @package _global_
+# Mirrors data/attribute_selection/response_attributes/response_attributes_k10.yaml
+# (same as experiments/attribute_responses/configs/attributes/k10.yaml).
+attributes:
+  - emotionally neutral
+  - casual
+  - elaborate
+  - acknowledges uncertainty
+  - prescriptive
+  - assumes no prior knowledge
+  - gentle
+  - persuasive
+  - presents multiple perspectives
+  - collaborative

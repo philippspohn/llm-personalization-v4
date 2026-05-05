@@ -1,0 +1,20 @@
+# Trained routing with hard argmax labels: for each train user, the label
+# is the (response_attribute, side) whose cached candidate most strongly
+# satisfies the user's GT axis (per the gpt-oss judge).
+
+_target_: llm_personalization.personalization_system_v2.methods.routing.TrainedRouting
+llm: ${llm}
+attributes: ${attributes}
+label_mode: argmax
+text_classification_model:
+  base_model: answerdotai/ModernBERT-base
+  pooling: mean
+  max_length: 4096
+  dtype: bfloat16
+train_kwargs:
+  batch_size: 4
+  grad_accum_steps: 8
+  epochs: 3
+  lr: 2.0e-5
+predict_batch_size: 16
+max_chars_per_msg: 1024

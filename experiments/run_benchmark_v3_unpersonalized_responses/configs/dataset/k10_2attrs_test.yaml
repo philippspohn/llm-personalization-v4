@@ -1,0 +1,4 @@
+# @package _global_
+pool_tag: k10_2attrs
+split_name: test
+input_path: data/attribute_responses/gpt-oss-120b_k10_2attrs_nemotron/test.jsonl
